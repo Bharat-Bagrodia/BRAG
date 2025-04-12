@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX Battle: Zerodha vs. Dhan vs. Upstox – BRAG Insight Report</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --brag-red: #E53935;
+            --brag-dark-red: #C62828;
+            --brag-light-red: #FFCDD2;
+            --dark-gray: #333333;
+            --medium-gray: #757575;
+            --light-gray: #F5F5F5;
+            --white: #FFFFFF;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--white);
+            background-color: #222222;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--brag-red);
+            color: var(--white);
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect x="0" y="0" width="50" height="50" fill="%23C62828" opacity="0.1"/><rect x="50" y="50" width="50" height="50" fill="%23C62828" opacity="0.1"/></svg>');
+            opacity: 0.5;
+        }
+
+        .hero {
+            position: relative;
+            z-index: 1;
+        }
+
+        .brag-logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--white);
+            color: var(--brag-red);
+            border-radius: var(--border-radius);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .section {
+            padding: 3rem 0;
+            border-bottom: 1px solid #444444;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background-color: var(--brag-red);
+        }
+
+        h3, h4 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            color: var(--white);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--white);
+        }
+
+        .card {
+            background-color: #333333;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .methodology-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .methodology-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .methodology-icon {
+            background-color: var(--brag-red);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            color: var(--white);
+        }
+
+        thead {
+            background-color: var(--brag-red);
+            color: var(--white);
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            border: 1px solid #444444;
+        }
+
+        tr:nth-child(even) {
+            background-color: #2A2A2A;
+        }
+
+        .takeaways-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .broker-card {
+            position: relative;
+            padding-top: 2.5rem;
+        }
+
+        .broker-name {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background-color: var(--brag-red);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+        }
+
+        .strengths-label, .weaknesses-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .strengths-label {
+            color: #4CAF50;
+        }
+
+        .weaknesses-label {
+            color: var(--brag-red);
+        }
+
+        ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--white);
+        }
+
+        .quote {
+            font-style: italic;
+            padding: 1rem;
+            background-color: #444444;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            position: relative;
+            color: var(--white);
+        }
+
+        .quote::before {
+            content: '"';
+            font-size: 3rem;
+            position: absolute;
+            top: -15px;
+            left: 10px;
+            color: var(--brag-red);
+            opacity: 0.5;
+        }
+
+        .framework-steps {
+            counter-reset: step;
+            margin: 2rem 0;
+        }
+
+        .step {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+
+        .step-number {
+            counter-increment: step;
+            width: 40px;
+            height: 40px;
+            background-color: var(--brag-red);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step-number::before {
+            content: counter(step);
+        }
+
+        .step-content h4 {
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .cta-section {
+            background-color: #333333;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--brag-red);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: var(--brag-dark-red);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--brag-red);
+            color: var(--brag-red);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--brag-light-red);
+            color: var(--brag-dark-red);
+        }
+
+        footer {
+            background-color: var(--dark-gray);
+            color: var(--white);
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .social-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .copyright {
+            color: #AAAAAA;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive styles */
+        @media screen and (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.75rem;
+            }
+            
+            .methodology-container, .takeaways-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Chart styles */
+        .chart-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .chart {
+            background-color: #333333;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .bar-chart {
+            height: 300px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 0 1rem;
+            position: relative;
+        }
+
+        .bar-chart::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+        }
+
+        .bar {
+            width: 100%;
+            background-color: var(--brag-red);
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            transition: height 1s ease;
+            position: relative;
+        }
+
+        .bar-label {
+            margin-top: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .bar-value {
+            position: relative;
+            top: -25px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .radar-chart {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        .radar-label {
+            position: absolute;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .radar-chart svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.2s; }
+        .section:nth-child(3) { animation-delay: 0.3s; }
+        .section:nth-child(4) { animation-delay: 0.4s; }
+        .section:nth-child(5) { animation-delay: 0.5s; }
+        .section:nth-child(6) { animation-delay: 0.6s; }
+        .section:nth-child(7) { animation-delay: 0.7s; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container hero">
+            <div class="brag-logo">BRAG</div>
+            <h1>UX Battle: Zerodha vs. Dhan vs. Upstox</h1>
+            <p class="subtitle">An in-depth analysis of India's top trading platforms through the lens of user experience.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="section" id="introduction">
+            <h2>Introduction</h2>
+            <div class="card">
+                <p>In India's booming retail investment space, trading platforms have become utilities — not just tools. However, while features are largely comparable across apps, user experience is now the true differentiator.</p>
+                <p>BRAG conducted a deep heuristic and behavioral usability study of India's three biggest trading platforms:</p>
+                <ul>
+                    <li>Zerodha (India's largest discount broker)</li>
+                    <li>Dhan (UX-first newer entrant)</li>
+                    <li>Upstox (VC-backed with mass reach)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section" id="methodology">
+            <h2>Methodology</h2>
+            <div class="methodology-container">
+                <div class="card">
+                    <div class="methodology-item">
+                        <div class="methodology-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h4>Sample Size</h4>
+                            <p>150 participants (Tier 1 + Tier 2 cities)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="methodology-item">
+                        <div class="methodology-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div>
+                            <h4>Age Group</h4>
+                            <p>20–38 years</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="methodology-item">
+                        <div class="methodology-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div>
+                            <h4>Tools Used</h4>
+                            <p>Maze, Useberry, Attention Insight, Lookback</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="methodology-item">
+                        <div class="methodology-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div>
+                            <h4>Test Tasks</h4>
+                            <ul>
+                                <li>Buy a stock</li>
+                                <li>Check P&L</li>
+                                <li>Add funds</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="methodology-item">
+                        <div class="methodology-icon">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <div>
+                            <h4>Evaluation Framework</h4>
+                            <p>Nielsen's 10 Heuristics + BRAG's Friction Map</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="quantitative-metrics">
+            <h2>Quantitative Metrics</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Zerodha</th>
+                            <th>Dhan</th>
+                            <th>Upstox</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Avg. Task Completion Time</td>
+                            <td>47 sec</td>
+                            <td>53 sec</td>
+                            <td>66 sec</td>
+                        </tr>
+                        <tr>
+                            <td>Error Rate (%)</td>
+                            <td>7.1%</td>
+                            <td>9.5%</td>
+                            <td>15.4%</td>
+                        </tr>
+                        <tr>
+                            <td>Time to First Action</td>
+                            <td>4.2 sec</td>
+                            <td>3.8 sec</td>
+                            <td>5.9 sec</td>
+                        </tr>
+                        <tr>
+                            <td>Task Confidence (/10)</td>
+                            <td>8.1</td>
+                            <td>7.6</td>
+                            <td>6.2</td>
+                        </tr>
+                        <tr>
+                            <td>Feature Discoverability</td>
+                            <td>Medium</td>
+                            <td>High</td>
+                            <td>Low</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart">
+                    <h4 class="chart-title">Task Completion Time (sec)</h4>
+                    <div class="bar-chart" id="completionTimeChart">
+                        <div class="bar-group">
+                            <div class="bar" style="height: 213px;">
+                                <div class="bar-value">47s</div>
+                            </div>
+                            <div class="bar-label">Zerodha</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 241px;">
+                                <div class="bar-value">53s</div>
+                            </div>
+                            <div class="bar-label">Dhan</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 270px;">
+                                <div class="bar-value">66s</div>
+                            </div>
+                            <div class="bar-label">Upstox</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart">
+                    <h4 class="chart-title">Error Rate (%)</h4>
+                    <div class="bar-chart" id="errorRateChart">
+                        <div class="bar-group">
+                            <div class="bar" style="height: 138px;">
+                                <div class="bar-value">7.1%</div>
+                            </div>
+                            <div class="bar-label">Zerodha</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 185px;">
+                                <div class="bar-value">9.5%</div>
+                            </div>
+                            <div class="bar-label">Dhan</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 270px;">
+                                <div class="bar-value">15.4%</div>
+                            </div>
+                            <div class="bar-label">Upstox</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="heuristic-breakdown">
+            <h2>Heuristic Breakdown</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Heuristic</th>
+                            <th>Zerodha</th>
+                            <th>Dhan</th>
+                            <th>Upstox</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Recognition vs Recall</td>
+                            <td>Strong – Icons are familiar</td>
+                            <td>Strong – Good onboarding tooltips</td>
+                            <td>Weak – Too many similar icons</td>
+                        </tr>
+                        <tr>
+                            <td>Aesthetic & Minimal Design</td>
+                            <td>Very Minimal</td>
+                            <td>Clean but dense</td>
+                            <td>Cluttered, ad-heavy</td>
+                        </tr>
+                        <tr>
+                            <td>Visibility of System Status</td>
+                            <td>Excellent</td>
+                            <td>Good</td>
+                            <td>Fair (delayed feedback)</td>
+                        </tr>
+                        <tr>
+                            <td>User Control & Freedom</td>
+                            <td>Weak – limited undo</td>
+                            <td>Strong – Clear exit points</td>
+                            <td>Fair – Back actions unclear</td>
+                        </tr>
+                        <tr>
+                            <td>Consistency & Standards</td>
+                            <td>Strong</td>
+                            <td>Moderate</td>
+                            <td>Moderate</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="chart">
+                <h4 class="chart-title">Heuristic Comparison</h4>
+                <div class="radar-chart" id="radarChart">
+                    <svg viewBox="0 0 500 500">
+                        <!-- Background pentagon shape -->
+                        <polygon points="250,70 430,180 380,370 120,370 70,180" fill="rgba(229, 57, 53, 0.1)" stroke="#555" stroke-width="1"></polygon>
+                        <polygon points="250,110 390,198 350,346 150,346 110,198" fill="rgba(229, 57, 53, 0.05)" stroke="#555" stroke-width="1"></polygon>
+                        <polygon points="250,150 350,216 320,322 180,322 150,216" fill="rgba(229, 57, 53, 0.02)" stroke="#555" stroke-width="1"></polygon>
+                        <polygon points="250,190 310,234 290,298 210,298 190,234" fill="#444" stroke="#555" stroke-width="1"></polygon>
+                        
+                        <!-- Axes -->
+                        <line x1="250" y1="70" x2="250" y2="370" stroke="#555" stroke-width="1"></line>
+                        <line x1="70" y1="180" x2="430" y2="180" stroke="#555" stroke-width="1"></line>
+                        <line x1="120" y1="370" x2="380" y2="370" stroke="#555" stroke-width="1"></line>
+                        <line x1="430" y1="180" x2="120" y2="370" stroke="#555" stroke-width="1"></line>
+                        <line x1="70" y1="180" x2="380" y2="370" stroke="#555" stroke-width="1"></line>
+                        
+                        <!-- Zerodha data -->
+                        <polygon points="250,90 380,190 350,340 150,320 100,200" fill="rgba(229, 57, 53, 0.5)" stroke="#E53935" stroke-width="2"></polygon>
+                        
+                        <!-- Dhan data -->
+                        <polygon points="250,110 390,198 330,330 160,336 120,210" fill="rgba(63, 81, 181, 0.3)" stroke="#3F51B5" stroke-width="2"></polygon>
+                        
+                        <!-- Upstox data -->
+                        <polygon points="250,150 350,240 300,310 180,320 150,230" fill="rgba(76, 175, 80, 0.3)" stroke="#4CAF50" stroke-width="2"></polygon>
+                        
+                        <!-- Labels -->
+                        <text x="250" y="50" text-anchor="middle" font-size="12" fill="white">Recognition vs Recall</text>
+                        <text x="450" y="180" text-anchor="start" font-size="12" fill="white">Aesthetic Design</text>
+                        <text x="390" y="390" text-anchor="middle" font-size="12" fill="white">System Status</text>
+                        <text x="110" y="390" text-anchor="middle" font-size="12" fill="white">User Control</text>
+                        <text x="50" y="180" text-anchor="end" font-size="12" fill="white">Consistency</text>
+                        
+                        <!-- Legend -->
+                        <rect x="200" y="420" width="15" height="15" fill="rgba(229, 57, 53, 0.5)" stroke="#E53935" stroke-width="2"></rect>
+                        <text x="220" y="432" font-size="12" fill="white">Zerodha</text>
+                        
+                        <rect x="280" y="420" width="15" height="15" fill="rgba(63, 81, 181, 0.3)" stroke="#3F51B5" stroke-width="2"></rect>
+                        <text x="300" y="432" font-size="12" fill="white">Dhan</text>
+                        
+                        <rect x="350" y="420" width="15" height="15" fill="rgba(76, 175, 80, 0.3)" stroke="#4CAF50" stroke-width="2"></rect>
+                        <text x="370" y="432" font-size="12" fill="white">Upstox</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="ux-takeaways">
+            <h2>UX Takeaways & Patterns</h2>
+            <div class="takeaways-grid">
+                <div class="card broker-card">
+                    <div class="broker-name">Zerodha</div>
+                    <div class="strengths-label">Strengths:</div>
+                    <p>Fastest task completion, cleanest visual hierarchy, few distractions</p>
+                    
+                    <div class="weaknesses-label">Weaknesses:</div>
+                    <ul>
+                        <li>Poor for new users — Lack of visual onboarding</li>
+                        <li>Hidden features need 3+ taps</li>
+                    </ul>
+                    
+                    <div class="quote">
+                        "I know what I'm doing here — but I wouldn't give this to my dad to figure out."
+                    </div>
+                </div>
+                
+                <div class="card broker-card">
+                    <div class="broker-name">Dhan</div>
+                    <div class="strengths-label">Strengths:</div>
+                    <p>Clear discoverability, persistent help cues</p>
+                    
+                    <div class="weaknesses-label">Weaknesses:</div>
+                    <ul>
+                        <li>Too many action buttons</li>
+                        <li>Alert center UX secondary</li>
+                    </ul>
+                    
+                    <div class="quote">
+                        "Nice design but feels a bit cramped. I like the help bubbles though."
+                    </div>
+                </div>
+                
+                <div class="card broker-card">
+                    <div class="broker-name">Upstox</div>
+                    <div class="strengths-label">Strengths:</div>
+                    <p>Friendly branding, great personalization potential</p>
+                    
+                    <div class="weaknesses-label">Weaknesses:</div>
+                    <ul>
+                        <li>Highest error rate</li>
+                        <li>Banner-heavy UI</li>
+                    </ul>
+                    
+                    <div class="quote">
+                        "Why are there banners inside my trade screen? It's distracting."
+                
