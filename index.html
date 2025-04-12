@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRAG - Bagrodia Research and Analytics Group</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #222;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        section {
+            padding: 5rem 2rem;
+            scroll-margin-top: 80px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Bain-inspired color theme */
+        :root {
+            --bain-red: #d30000;
+            --bain-dark-red: #b10000;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333333;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--bain-red);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--bain-dark-red);
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark-gray);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--bain-red);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-gray);
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--bain-red);
+        }
+
+        .search-bar {
+            display: flex;
+            margin-left: 2rem;
+        }
+
+        .search-bar input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+
+        .search-bar button {
+            background-color: var(--bain-red);
+            border: none;
+            border-radius: 0 4px 4px 0;
+            padding: 8px 12px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark-gray);
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            background-color: var(--bain-red);
+            padding: 0;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero .btn {
+            background-color: white;
+            color: var(--bain-red);
+        }
+
+        .hero .btn:hover {
+            background-color: var(--light-gray);
+        }
+
+        /* About Section */
+        .about {
+            background-color: white;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+            color: var(--bain-red);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 4px;
+            background-color: var(--bain-red);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .about-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .about-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        /* Services Section */
+        .services {
+            background-color: var(--light-gray);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            color: var(--bain-red);
+            margin-bottom: 1rem;
+        }
+
+        /* Insights Section */
+        .insights {
+            background-color: white;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .insight-card {
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+            padding: 2rem;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .insight-content {
+            padding: 1rem 0;
+        }
+
+        .insight-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .insight-card p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .insight-link {
+            color: var(--bain-red);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .insight-link i {
+            margin-left: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .insight-link:hover i {
+            transform: translateX(5px);
+        }
+
+        /* Case Studies Section */
+        .case-studies {
+            background-color: var(--light-gray);
+        }
+
+        .case-studies-slider {
+            display: flex;
+            overflow-x: auto;
+            gap: 2rem;
+            padding: 1rem 0;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+
+        .case-studies-slider::-webkit-scrollbar {
+            display: none;
+        }
+
+        .case-study-card {
+            min-width: 350px;
+            scroll-snap-align: start;
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .client-logo {
+            width: 100px;
+            height: 100px;
+            background-color: var(--bain-red);
+            color: white;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .testimonial {
+            font-style: italic;
+            margin-bottom: 1rem;
+            color: #666;
+        }
+
+        .client-name {
+            font-weight: 700;
+            color: var(--dark-gray);
+        }
+
+        .slider-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .slider-btn {
+            background-color: var(--bain-red);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .slider-btn:hover {
+            background-color: var(--bain-dark-red);
+        }
+
+        /* Contact Section */
+        .contact {
+            background-color: white;
+        }
+
+        .contact-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3rem;
+            justify-content: center;
+        }
+
+        .contact-info {
+            max-width: 600px;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            background-color: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .contact-detail:hover {
+            transform: translateY(-5px);
+        }
+
+        .contact-icon {
+            margin-right: 1rem;
+            font-size: 1.25rem;
+            color: var(--bain-red);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .social-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: var(--bain-red);
+            color: white;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-5px);
+            background-color: var(--bain-dark-red);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-gray);
+            color: white;
+            padding: 3rem 2rem;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3rem;
+        }
+
+        .footer-column {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-title {
+            font-size: 1.25rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--bain-red);
+        }
+
+        .newsletter-form {
+            display: flex;
+            margin-top: 1rem;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .newsletter-form button {
+            background-color: var(--bain-red);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .newsletter-form button:hover {
+            background-color: var(--bain-dark-red);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .about-content {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background-color: white;
+                flex-direction: column;
+                align-items: center;
+                padding: 2rem 0;
+                transition: left 0.3s ease;
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .nav-links li {
+                margin: 1rem 0;
+            }
+
+            .search-bar {
+                margin-left: 0;
+                margin-top: 1rem;
+                width: 100%;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2.25rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Emoji animation */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .emoji {
+            display: inline-block;
+            animation: bounce 2s infinite;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="#" class="logo">B<span>RAG</span></a>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#insights">Insights</a></li>
+            <li><a href="#case-studies">Case Studies</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <div class="search-bar">
+                <input type="text" placeholder="Search...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="hero-content">
+            <h1 id="heroTagline">Unlocking Brand Potential Through Insightful Research <span class="emoji">✨</span></h1>
+            <p>We are a team of passionate researchers and analysts dedicated to helping businesses thrive through data-driven insights and innovative solutions.</p>
+            <a href="#contact" class="btn">Get Started <span class="emoji">🚀</span></a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">About Us <span class="emoji">🔍</span></h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>At Bagrodia Research and Analytics Group (BRAG), we believe in the power of research-driven insights to transform businesses. Our mission is to provide innovative solutions that help our clients make informed decisions and achieve sustainable growth.</p>
+                    <p>With a team of experts specializing in product consulting, UI/UX design, user research, and brand strategy, we bring a wealth of knowledge and experience to every project. We are committed to excellence, integrity, and delivering results that exceed expectations.</p>
+                    <p>Our vision is to be the leading research and analytics partner for businesses seeking to innovate, adapt, and thrive in an ever-changing market landscape.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">Our Services <span class="emoji">⚙️</span></h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>Product Consulting <span class="emoji">💡</span></h3>
+                    <p>We help you develop and refine your product strategy through market analysis, competitive benchmarking, and user feedback, ensuring your products meet market needs and business goals.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>UI/UX Design <span class="emoji">🎨</span></h3>
+                    <p>Our design experts create intuitive, engaging, and accessible user interfaces that enhance user experience, drive engagement, and build brand loyalty.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>User Research <span class="emoji">👥</span></h3>
+                    <p>Through user interviews, surveys, and usability testing, we gather valuable insights about your target audience, helping you create products and services that truly resonate with users.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h3>Complex Problem Solving <span class="emoji">🧩</span></h3>
+                    <p>We tackle intricate business challenges with a structured approach, combining data analysis, creative thinking, and industry expertise to develop effective solutions.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Focus Group Discussions <span class="emoji">💬</span></h3>
+                    <p>Our moderated focus groups provide deep qualitative insights into consumer opinions, preferences, and behaviors, informing better business decisions.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Brand Innovation <span class="emoji">📈</span></h3>
+                    <p>We help you build and evolve your brand through market research, competitor analysis, positioning strategy, and creative concept development.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Insights Section -->
+    <section id="insights" class="insights">
+        <div class="container">
+            <h2 class="section-title">Latest Insights <span class="emoji">📊</span></h2>
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <div class="insight-content">
+                        <h3>The Future of User Experience Design <span class="emoji">🔮</span></h3>
+                        <p>Explore emerging trends in UX design and how they are reshaping digital interactions across industries.</p>
+                        <a href="#" class="insight-link">Read More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-content">
+                        <h3>Leveraging Data for Strategic Decision Making <span class="emoji">📱</span></h3>
+                        <p>Learn how businesses are using data analytics to drive innovation and gain competitive advantage.</p>
+                        <a href="#" class="insight-link">Read More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-content">
+                        <h3>Building Brands That Resonate in a Digital World <span class="emoji">🌐</span></h3>
+                        <p>Discover strategies for creating authentic brand experiences that connect with modern consumers.</p>
+                        <a href="#" class="insight-link">Read More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Case Studies Section -->
+    <section id="case-studies" class="case-studies">
+        <div class="container">
+            <h2 class="section-title">Case Studies <span class="emoji">📝</span></h2>
+            <div class="case-studies-slider" id="caseStudiesSlider">
+                <div class="case-study-card">
+                    <div class="client-logo">Client A</div>
+                    <p class="testimonial">"BRAG helped us completely transform our approach to user research, resulting in a 40% increase in customer satisfaction and significant improvements in our product design process."</p>
+                    <p class="client-name">- Sarah Johnson, Product Director</p>
+                </div>
+                <div class="case-study-card">
+                    <div class="client-logo">Client B</div>
+                    <p class="testimonial">"Working with the BRAG team was a game-changer for our brand strategy. Their insights helped us reposition our brand in a competitive market and connect with new customer segments."</p>
+                    <p class="client-name">- Michael Chen, CMO</p>
+                </div>
+                <div class="case-study-card">
+                    <div class="client-logo">Client C</div>
+                    <p class="testimonial">"The UI/UX redesign project delivered by BRAG exceeded our expectations. Our new interface has received overwhelming positive feedback and has significantly improved user engagement metrics."</p>
+                    <p class="client-name">- Amanda Lewis, CEO</p>
+                </div>
+                <div class="case-study-card">
+                    <div class="client-logo">Client D</div>
+                    <p class="testimonial">"BRAG's focus group methodology provided invaluable insights that shaped our product development roadmap and helped us address key customer pain points."</p>
+                    <p class="client-name">- Robert Taylor, Innovation Lead</p>
+                </div>
+            </div>
+            <div class="slider-controls">
+                <button class="slider-btn" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+                <button class="slider-btn" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Contact Us <span class="emoji">📞</span></h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-detail">
+                        <div class="contact-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div>
+                            <h3>Website</h3>
+                            <p>www.brag.asia</p>
+                        </div>
+                    </div>
+                    <div class="contact-detail">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h3>Email Us <span class="emoji">✉️</span></h3>
+                            <p>bharat@brag.asia</p>
+                        </div>
+                    </div>
+                    <div class="contact-detail">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div>
+                            <h3>Call Us <span class="emoji">📱</span></h3>
+                            <p>+91-7973817350</p>
+                        </div>
+                    </div>
+                    <div class="social-links">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3 class="footer-title">BRAG <span class="emoji">🚀</span></h3>
+                    <p>Bagrodia Research and Analytics Group is dedicated to delivering innovative solutions and insights that drive business growth and transformation.</p>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-title">Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#hero">Home</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#insights">Insights</a></li>
+                        <li><a href="#case-studies">Case Studies</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-title">Legal</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-title">Connect With Us <span class="emoji">🤝</span></h3>
+                    <p>Reach out to us directly at <strong>bharat@brag.asia</strong> or <strong>+91-7973817350</strong> for consultations, inquiries, or to discuss your project needs.</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 Bagrodia Research and Analytics Group. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Close mobile menu when clicking on a nav link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            });
+        });
+
+        // Dynamic Hero Tagline
+        const heroTagline = document.getElementById('heroTagline');
+        const taglines = [
+            "Unlocking Brand Potential Through Insightful Research <span class='emoji'>✨</span>",
+            "Designing User-Centric Experiences for Tomorrow <span class='emoji'>🎯</span>",
+            "Innovative Solutions for Complex Challenges <span class='emoji'>💪</span>"
+        ];
+        
+        let currentTaglineIndex = 0;
+        
+        function rotateTagline() {
+            currentTaglineIndex = (currentTaglineIndex + 1) % taglines.length;
+            heroTagline.innerHTML = taglines[currentTaglineIndex];
+        }
+        
+        setInterval(rotateTagline, 5000);
+
+        // Case Studies Slider
+        const slider = document.getElementById('caseStudiesSlider');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        nextBtn.addEventListener('click', () => {
+            slider.scrollBy({ left: 400, behavior: 'smooth' });
+        });
+        
+        prevBtn.addEventListener('click', () => {
+            slider.scrollBy({ left: -400, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
