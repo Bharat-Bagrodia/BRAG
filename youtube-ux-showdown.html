@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Channel UX Showdown – Comparative Research by BRAG</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --brag-red: #E53935;
+            --brag-dark-red: #C62828;
+            --brag-light-red: #FFCDD2;
+            --dark-gray: #333333;
+            --medium-gray: #757575;
+            --light-gray: #F5F5F5;
+            --white: #FFFFFF;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--white);
+            background-color: #222222;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--brag-red);
+            color: var(--white);
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect x="0" y="0" width="50" height="50" fill="%23C62828" opacity="0.1"/><rect x="50" y="50" width="50" height="50" fill="%23C62828" opacity="0.1"/></svg>');
+            opacity: 0.5;
+        }
+
+        .hero {
+            position: relative;
+            z-index: 1;
+        }
+
+        .brag-logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--white);
+            color: var(--brag-red);
+            border-radius: var(--border-radius);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .section {
+            padding: 3rem 0;
+            border-bottom: 1px solid #444444;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background-color: var(--brag-red);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            color: var(--white);
+        }
+
+        h4 {
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--white);
+        }
+
+        .card {
+            background-color: #333333;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .methodology-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .methodology-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .methodology-icon {
+            background-color: var(--brag-red);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            color: var(--white);
+        }
+
+        thead {
+            background-color: var(--brag-red);
+            color: var(--white);
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            border: 1px solid #444444;
+        }
+
+        tr:nth-child(even) {
+            background-color: #2A2A2A;
+        }
+
+        .takeaways-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .channel-card {
+            position: relative;
+            padding-top: 2.5rem;
+        }
+
+        .channel-name {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background-color: var(--brag-red);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+        }
+
+        .strengths-label, .weaknesses-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .strengths-label {
+            color: #4CAF50;
+        }
+
+        .weaknesses-label {
+            color: var(--brag-red);
+        }
+
+        ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--white);
+        }
+
+        .quote {
+            font-style: italic;
+            padding: 1rem;
+            background-color: #2A2A2A;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            position: relative;
+            color: var(--white);
+        }
+
+        .quote::before {
+            content: '"';
+            font-size: 3rem;
+            position: absolute;
+            top: -15px;
+            left: 10px;
+            color: var(--brag-red);
+            opacity: 0.2;
+        }
+
+        .framework-steps {
+            counter-reset: step;
+            margin: 2rem 0;
+        }
+
+        .step {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+
+        .step-number {
+            counter-increment: step;
+            width: 40px;
+            height: 40px;
+            background-color: var(--brag-red);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step-number::before {
+            content: counter(step);
+        }
+
+        .step-content h4 {
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .cta-section {
+            background-color: #2A2A2A;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--brag-red);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: var(--brag-dark-red);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--brag-red);
+            color: var(--brag-red);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(229, 57, 53, 0.1);
+        }
+
+        footer {
+            background-color: var(--dark-gray);
+            color: var(--white);
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .social-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .copyright {
+            color: #AAAAAA;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive styles */
+        @media screen and (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.75rem;
+            }
+            
+            .methodology-container, .takeaways-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Chart styles */
+        .chart-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .chart {
+            background-color: #333333;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .bar-chart {
+            height: 300px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 0 1rem;
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+        }
+
+        .bar {
+            width: 100%;
+            background-color: var(--brag-red);
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            transition: height 1s ease;
+        }
+
+        .bar-label {
+            margin-top: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .bar-value {
+            position: relative;
+            top: -25px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .radar-chart {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        .radar-label {
+            position: absolute;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .radar-chart svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.2s; }
+        .section:nth-child(3) { animation-delay: 0.3s; }
+        .section:nth-child(4) { animation-delay: 0.4s; }
+        .section:nth-child(5) { animation-delay: 0.5s; }
+        .section:nth-child(6) { animation-delay: 0.6s; }
+        .section:nth-child(7) { animation-delay: 0.7s; }
+
+        /* YouTube specific icons */
+        .youtube-icon {
+            color: var(--brag-red);
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container hero">
+            <div class="brag-logo">BRAG</div>
+            <h1>YouTube Channel UX Showdown</h1>
+            <p class="subtitle">Comparative Research of India's Leading Finance Education Channels</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="section" id="introduction">
+            <h2>Introduction</h2>
+            <div class="card">
+                <p>In the attention economy, where every second counts, YouTube channels have evolved beyond just content — they're now brands, interfaces, and businesses. In this report, BRAG analyzes and compares the UX, content structure, and viewer journey across India's three leading finance/education YouTube channels:</p>
+                <ul>
+                    <li><strong>CA Rachana Phadke Ranade</strong> (Finance education for beginners)</li>
+                    <li><strong>Asset Yogi</strong> (Real estate and investing deep-dives)</li>
+                    <li><strong>Pranjal Kamra (Finology)</strong> (Behavioral finance and strategy)</li>
+                </ul>
+                <p>The goal: Decode which channel maximizes clarity, trust, and retention — and how their UX design choices impact learning.</p>
+            </div>
+        </section>
+
+        <section class="section" id="methodology">
+            <h2>Methodology</h2>
+            <div class="methodology-container">
+                <div class="card">
+                    <div class="methodology-item">
+                        <div class="methodology-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h4>Sample Size</h4>
+                            <p>250 viewers across India</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="methodology-item">
+                        <div class="methodology-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div>
+                            <h4>Tools Used</h4>
+                            <p>TubeBuddy, Vidooly, YouTube Studio Analysis, Lookback, Attention Insight</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="methodology-item">
+                        <div class="methodology-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div>
+                            <h4>Test Tasks</h4>
+                            <ul>
+                                <li>Navigate playlists</li>
+                                <li>Find latest IPO video</li>
+                                <li>Subscribe and enable alerts</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="methodology-item">
+                        <div class="methodology-icon">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <div>
+                            <h4>Evaluation Framework</h4>
+                            <p>Nielsen's Heuristics + BRAG's Viewer Engagement Funnel (VEF)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="quantitative-metrics">
+            <h2>Quantitative Metrics</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>CA Rachana</th>
+                            <th>Asset Yogi</th>
+                            <th>Pranjal Kamra</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Avg. Watch Time (min)</td>
+                            <td>6.2</td>
+                            <td>7.9</td>
+                            <td>8.5</td>
+                        </tr>
+                        <tr>
+                            <td>Click-Through Rate (CTR %)</td>
+                            <td>6.8</td>
+                            <td>7.3</td>
+                            <td>5.9</td>
+                        </tr>
+                        <tr>
+                            <td>Subscriber Conversion Rate (%)</td>
+                            <td>2.1</td>
+                            <td>1.5</td>
+                            <td>3.2</td>
+                        </tr>
+                        <tr>
+                            <td>Thumbnail Recall Score (/10)</td>
+                            <td>7.2</td>
+                            <td>6.5</td>
+                            <td>8.0</td>
+                        </tr>
+                        <tr>
+                            <td>Playlist Navigation Completion</td>
+                            <td>74%</td>
+                            <td>68%</td>
+                            <td>81%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart">
+                    <h4 class="chart-title">Avg. Watch Time (min)</h4>
+                    <div class="bar-chart" id="watchTimeChart">
+                        <div class="bar-group">
+                            <div class="bar" style="height: 73%;">
+                                <div class="bar-value">6.2</div>
+                            </div>
+                            <div class="bar-label">CA Rachana</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 93%;">
+                                <div class="bar-value">7.9</div>
+                            </div>
+                            <div class="bar-label">Asset Yogi</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 100%;">
+                                <div class="bar-value">8.5</div>
+                            </div>
+                            <div class="bar-label">Pranjal Kamra</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart">
+                    <h4 class="chart-title">Subscriber Conversion Rate (%)</h4>
+                    <div class="bar-chart" id="conversionRateChart">
+                        <div class="bar-group">
+                            <div class="bar" style="height: 66%;">
+                                <div class="bar-value">2.1%</div>
+                            </div>
+                            <div class="bar-label">CA Rachana</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 47%;">
+                                <div class="bar-value">1.5%</div>
+                            </div>
+                            <div class="bar-label">Asset Yogi</div>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 100%;">
+                                <div class="bar-value">3.2%</div>
+                            </div>
+                            <div class="bar-label">Pranjal Kamra</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="heuristic-breakdown">
+            <h2>Heuristic Breakdown</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Heuristic</th>
+                            <th>CA Rachana</th>
+                            <th>Asset Yogi</th>
+                            <th>Pranjal Kamra</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Recognition vs Recall</td>
+                            <td>Strong</td>
+                            <td>Moderate</td>
+                            <td>Strong</td>
+                        </tr>
+                        <tr>
+                            <td>Content Consistency</td>
+                            <td>Excellent</td>
+                            <td>High</td>
+                            <td>Moderate</td>
+                        </tr>
+                        <tr>
+                            <td>Visual Hierarchy</td>
+                            <td>Clean</td>
+                            <td>Dense</td>
+                            <td>Clutter-free</td>
+                        </tr>
+                        <tr>
+                            <td>Personalization & Storytelling</td>
+                            <td>Medium</td>
+                            <td>Strong</td>
+                            <td>Very Strong</td>
+                        </tr>
+                        <tr>
+                            <td>Trust & Authority Signal</td>
+                            <td>Strong</td>
+                            <td>Strong</td>
+                            <td>Strong</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="chart">
+                <h4 class="chart-title">Heuristic Comparison</h4>
+                <div class="radar-chart" id="radarChart">
+                    <svg viewBox="0 0 500 500">
+                        <!-- Background pentagon shape -->
+                        <polygon points="250,70 430,180 380,370 120,370 70,180" fill="rgba(229, 57, 53, 0.1)" stroke="#444" stroke-width="1"></polygon>
+                        <polygon points="250,110 390,198 350,346 150,346 110,198" fill="rgba(229, 57, 53, 0.05)" stroke="#444" stroke-width="1"></polygon>
+                        <polygon points="250,150 350,216 320,322 180,322 150,216" fill="rgba(229, 57, 53, 0.02)" stroke="#444" stroke-width="1"></polygon>
+                        <polygon points="250,190 310,234 290,298 210,298 190,234" fill="#333333" stroke="#444" stroke-width="1"></polygon>
+                        
+                        <!-- Axes -->
+                        <line x1="250" y1="70" x2="250" y2="370" stroke="#444" stroke-width="1"></line>
+                        <line x1="70" y1="180" x2="430" y2="180" stroke="#444" stroke-width="1"></line>
+                        <line x1="120" y1="370" x2="380" y2="370" stroke="#444" stroke-width="1"></line>
+                        <line x1="430" y1="180" x2="120" y2="370" stroke="#444" stroke-width="1"></line>
+                        <line x1="70" y1="180" x2="380" y2="370" stroke="#444" stroke-width="1"></line>
+                        
+                        <!-- CA Rachana data -->
+                        <polygon points="250,90 380,190 350,310 150,320 100,180" fill="rgba(229, 57, 53, 0.5)" stroke="#E53935" stroke-width="2"></polygon>
+                        
+                        <!-- Asset Yogi data -->
+                        <polygon points="250,110 370,198 380,330 160,336 120,210" fill="rgba(63, 81, 181, 0.3)" stroke="#3F51B5" stroke-width="2"></polygon>
+                        
+                        <!-- Pranjal Kamra data -->
+                        <polygon points="250,90 330,160 330,340 180,320 130,180" fill="rgba(76, 175, 80, 0.3)" stroke="#4CAF50" stroke-width="2"></polygon>
+                        
+                        <!-- Labels -->
+                        <text x="250" y="50" text-anchor="middle" font-size="12" fill="white">Recognition vs Recall</text>
+                        <text x="450" y="180" text-anchor="start" font-size="12" fill="white">Content Consistency</text>
+                        <text x="390" y="390" text-anchor="middle" font-size="12" fill="white">Visual Hierarchy</text>
+                        <text x="110" y="390" text-anchor="middle" font-size="12" fill="white">Personalization</text>
+                        <text x="50" y="180" text-anchor="end" font-size="12" fill="white">Trust & Authority</text>
+                        
+                        <!-- Legend -->
+                        <rect x="180" y="420" width="15" height="15" fill="rgba(229, 57, 53, 0.5)" stroke="#E53935" stroke-width="2"></rect>
+                        <text x="200" y="432" font-size="12" fill="white">CA Rachana</text>
+                        
+                        <rect x="280" y="420" width="15" height="15" fill="rgba(63, 81, 181, 0.3)" stroke="#3F51B5" stroke-width="2"></rect>
+                        <text x="300" y="432" font-size="12" fill="white">Asset Yogi</text>
+                        
+                        <rect x="380" y="420" width="15" height="15" fill="rgba(76, 175, 80, 0.3)" stroke="#4CAF50" stroke-width="2"></rect>
+                        <text x="400" y="432" font-size="12" fill="white">Pranjal Kamra</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="ux-takeaways">
+            <h2>UX Takeaways & Patterns</h2>
+            <div class="takeaways-grid">
+                <div class="card channel-card">
+                    <div class="channel-name">CA Rachana Phadke Ranade</div>
+                    <div class="strengths-label">Strengths:</div>
+                    <p>Clean branding, excellent structure for beginners, high trust tone</p>
+                    
+                    <div class="weaknesses-label">Weaknesses:</div>
+                    <ul>
+                        <li>Repetitive visuals in thumbnails</li>
+                        <li>No deep-level segmentation by user type</li>
+                    </ul>
+                    
+                    <div class="quote">
+                        "Feels like a course, not a channel — and that's great if I'm just starting."
+                    </div>
+                </div>
+                
+                <div class="card channel-card">
+                    <div class="channel-name">Asset Yogi</div>
+                    <div class="strengths-label">Strengths:</div>
+                    <p>Long-form evergreen content, excellent detail</p>
+                    
+                    <div class="weaknesses-label">Weaknesses:</div>
+                    <ul>
+                        <li>Playlist UX is hard to follow</li>
+                        <li>Content lacks beginner pathways</li>
+                    </ul>
+                    
+                    <div class="quote">
+                        "I found great info… but had to search a lot before finding the right video."
+                    </div>
+                </div>
+                
+                <div class="card channel-card">
+                    <div class="channel-name">Pranjal Kamra</div>
+                    <div class="strengths-label">Strengths:</div>
+                    <p>Clear storytelling, strong call-to-action, personality-led trust</p>
+                    
+                    <div class="weaknesses-label">Weaknesses:</div>
+                    <ul>
+                        <li>Inconsistent visuals</li>
+                        <li>Comment moderation not always effective</li>
+                    </ul>
+                    
+                    <div class="quote">
+                        "I don't just watch him — I trust his opinion."
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="content-funnel">
+            <h2>BRAG's Content Funnel Framework: "VEF"</h2>
+            <div class="card">
+                
