@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX Battle Report Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        /* Root variables for theme */
+        :root {
+            --brag-red: #E53935; /* Material Red 600 */
+            --brag-dark-red: #C62828; /* Material Red 800 */
+            --brag-light-red: #FFCDD2; /* Material Red 100 */
+            --dark-gray: #333333;
+            --medium-gray: #757575;
+            --light-gray: #F5F5F5;
+            --white: #FFFFFF;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Basic reset and font */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background-color: #f0f0f0; /* Light background for the page */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Generator Styles */
+        .generator-container {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin: 2rem auto;
+            overflow: hidden;
+        }
+
+        .generator-header {
+            background-color: var(--brag-red);
+            color: var(--white);
+            padding: 1.5rem;
+        }
+
+        .generator-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background-color: var(--light-gray);
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease, border-bottom-color 0.3s ease;
+            border-bottom: 3px solid transparent;
+            color: var(--medium-gray);
+            text-align: center;
+            flex-grow: 1; /* Make tabs share space */
+        }
+
+        .tab:hover {
+             background-color: #e0e0e0;
+        }
+
+        .tab.active {
+            background-color: var(--white);
+            border-bottom-color: var(--brag-red);
+            color: var(--dark-gray);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 2rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+         input[type="text"]:focus, textarea:focus, select:focus {
+             border-color: var(--brag-red);
+             box-shadow: 0 0 0 2px var(--brag-light-red);
+             outline: none;
+         }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center; /* Center content */
+            padding: 0.75rem 1.5rem;
+            background-color: var(--brag-red);
+            color: var(--white);
+            text-decoration: none;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            gap: 0.5rem; /* Space between icon and text */
+        }
+
+        .btn:hover {
+            background-color: var(--brag-dark-red);
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--brag-red);
+            color: var(--brag-red);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--brag-light-red);
+            color: var(--brag-dark-red);
+        }
+
+        .btn-secondary {
+            background-color: var(--dark-gray);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background-color: #444;
+        }
+
+        /* Dynamic Item Sections */
+        .section-container {
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background-color: #fafafa; /* Slightly different background */
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--brag-red);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .broker-item, .metric-item, .heuristic-item {
+            background-color: var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 1.5rem; /* Increased padding */
+            margin-bottom: 1rem;
+            position: relative;
+            border: 1px solid #e0e0e0;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 0.75rem; /* Adjusted position */
+            right: 0.75rem; /* Adjusted position */
+            background: none;
+            border: none;
+            color: var(--brag-red);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .remove-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Action Buttons Container */
+        .actions-container {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee; /* Separator line */
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Preview Area */
+        .preview-container {
+            padding: 1rem;
+            margin-top: 1rem; /* Add space above preview */
+            overflow: auto; /* Allow scrolling if content overflows */
+            max-height: 800px; /* Limit height */
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+        }
+
+        .preview-actions {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+            gap: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                border-bottom-width: 1px; /* Adjust border for column layout */
+            }
+             .tab.active {
+                 border-bottom-color: #ddd; /* Use standard border color */
+                 border-left: 3px solid var(--brag-red); /* Use left border for active tab */
+             }
+            .actions-container {
+                flex-direction: column;
+                align-items: stretch; /* Make buttons full width */
+            }
+            .preview-actions {
+                flex-direction: column;
+                align-items: stretch; /* Make buttons full width */
+            }
+            .btn {
+                width: 100%; /* Make buttons full width */
+            }
+        }
+
+        /* --- Report Preview Styles --- */
+        /* These styles are injected into the generated report */
+        .report-styles {
+            /* Styles defined here will be added to the <head> of the downloaded HTML */
+            /* and used by html2pdf */
+            --brag-red: #E53935;
+            --brag-dark-red: #C62828;
+            --white: #FFFFFF;
+            --dark-gray: #333333;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85); /* Default text color for dark theme - Increased contrast */
+        }
+
+        .report-body {
+            background-color: #222222; /* Dark background for the report */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- FIX: Page Boundary --- */
+        .report-container {
+            max-width: 900px; /* Max width for the report content */
+            margin: 2rem auto; /* Center the report with VERTICAL margin */
+            padding: 0 2rem; /* Padding on the sides (increased slightly) */
+            background-color: #282828; /* Slightly lighter than body for subtle page effect */
+            border: 1px solid #444; /* Subtle border */
+            border-radius: var(--border-radius); /* Rounded corners for the page */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Subtle shadow for depth */
+            overflow: hidden; /* Ensure content respects border radius */
+        }
+
+        .report-header {
+            background-color: var(--brag-red);
+            color: var(--white);
+            padding: 3rem 2rem; /* Adjusted padding to match container */
+            margin: 0 -2rem; /* Extend header to container edges */
+            margin-bottom: 2rem; /* Space below header */
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 5px solid var(--brag-dark-red);
+            border-top-left-radius: var(--border-radius); /* Match container radius */
+            border-top-right-radius: var(--border-radius); /* Match container radius */
+        }
+
+        /* Subtle pattern for header */
+        .report-header::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M10 10 H90 V90 H10 Z" fill="none" stroke="%23FFFFFF" stroke-width="0.5" opacity="0.05"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFFFFF" stroke-width="0.5" opacity="0.05"/></svg>');
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .report-header > * {
+            position: relative; /* Ensure content is above the pattern */
+            z-index: 1;
+        }
+
+        .report-logo { /* Can be used for a logo text/element if needed */
+            font-weight: 900;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--white);
+            color: var(--brag-red);
+            border-radius: var(--border-radius);
+        }
+
+        .report-main-title {
+            font-size: 2.5rem; /* Larger title */
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+             color: var(--white); /* Ensure title is white */
+        }
+        .report-subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9); /* Slightly brighter subtitle */
+        }
+
+        .report-section {
+            padding: 2rem 0; /* Reduced vertical padding slightly */
+            border-bottom: 1px solid #444444; /* Separator */
+        }
+        .report-section:last-of-type { /* Use last-of-type for better targeting */
+            border-bottom: none; /* No border for the last section */
+            padding-bottom: 0; /* Remove bottom padding on last section */
+        }
+
+        .report-section p { /* Improve default paragraph contrast */
+             color: rgba(255, 255, 255, 0.85);
+             margin-bottom: 1rem; /* Add space below paragraphs */
+        }
+
+        .report-card {
+            background-color: #333333;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid #444; /* Subtle border */
+        }
+
+        /* Methodology Grid */
+        .report-methodology-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 1.5rem;
+        }
+
+        .report-methodology-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: #444; /* Slightly different background */
+            border-radius: var(--border-radius);
+        }
+
+        .report-methodology-icon {
+            background-color: var(--brag-red);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .report-methodology-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--white);
+        }
+        .report-methodology-content p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8); /* Lighter text for methodology details */
+            margin-bottom: 0; /* Reset margin for methodology p */
+        }
+
+        .report-title { /* Section titles */
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.5rem; /* Space for the underline */
+        }
+
+        .report-title::after { /* Underline effect */
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background-color: var(--brag-red);
+            border-radius: 2px;
+        }
+
+        /* Tables */
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            color: var(--white);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border-radius: var(--border-radius);
+            overflow: hidden; /* Clip corners */
+        }
+
+        .report-table thead {
+            background-color: var(--brag-red);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .report-table th, .report-table td {
+            padding: 0.75rem 1rem;
+            border: 1px solid #444444;
+            color: rgba(255, 255, 255, 0.9); /* Lighter text in table cells */
+            vertical-align: top; /* Align content top */
+        }
+
+        .report-table th {
+             color: var(--white); /* Ensure header text is white */
+        }
+
+        .report-table tbody tr {
+             background-color: #333;
+             transition: background-color 0.2s ease;
+        }
+         .report-table tbody tr:hover {
+             background-color: #404040;
+         }
+
+        .report-table tbody tr:nth-child(even) {
+            background-color: #2A2A2A;
+        }
+         .report-table tbody tr:nth-child(even):hover {
+             background-color: #353535;
+         }
+
+        /* --- FIX: Platform Deep Dive UI --- */
+         .report-broker-card {
+            position: relative;
+            padding: 2rem; /* Increased padding inside card */
+            padding-top: 3rem; /* More space for the name tag */
+            margin-top: 1.5rem; /* Add space above the card */
+            background-color: #3a3a3a; /* Slightly different card background */
+            display: flex; /* Use flexbox for better internal layout */
+            flex-direction: column; /* Stack elements vertically */
+            height: 100%; /* Make cards in grid same height */
+         }
+         .report-broker-card p em { /* Ensure description text is lighter */
+             color: rgba(255, 255, 255, 0.8);
+             display: block; /* Make description block */
+             margin-bottom: 1.5rem; /* Space after description */
+         }
+
+        .report-broker-name {
+            position: absolute;
+            top: -15px; /* Position above the card */
+            left: 20px;
+            background-color: var(--brag-red);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 2; /* Ensure tag is above card content */
+        }
+
+        .broker-strengths, .broker-weaknesses {
+            margin-bottom: 1.5rem; /* More space between sections */
+        }
+
+        .strengths-label, .weaknesses-label {
+            display: block; /* Ensure label is on its own line */
+            font-weight: 600;
+            margin-bottom: 0.75rem; /* Increased space below label */
+            font-size: 1.1rem; /* Slightly larger label */
+        }
+
+        .strengths-label {
+            color: #4CAF50; /* Green for strengths */
+        }
+
+        .weaknesses-label {
+            color: var(--brag-red); /* Red for weaknesses */
+        }
+
+        .strengths-list, .weaknesses-list {
+            list-style: none; /* Remove default bullets */
+            padding-left: 0;
+        }
+        .strengths-list li, .weaknesses-list li {
+            padding-left: 1.8em; /* Increased indent text */
+            position: relative;
+            margin-bottom: 0.6rem; /* Increased space between items */
+            color: rgba(255, 255, 255, 0.85); /* Lighter list item text */
+            line-height: 1.5; /* Improve line spacing */
+        }
+
+        /* Fix for Icons (already applied in v2, ensure it's correct) */
+        .strengths-list li::before,
+        .weaknesses-list li::before,
+        .quote-text::before {
+            display: inline-block; /* Needed for font awesome */
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            font-family: 'Font Awesome 6 Free'; /* Ensure Font Awesome is applied */
+            font-weight: 900; /* Use solid style */
+            position: absolute;
+            left: 0;
+            top: 0.1em; /* Adjust vertical alignment */
+        }
+
+        .strengths-list li::before {
+            content: '\\f00c'; /* Font Awesome check icon */
+            color: #4CAF50;
+        }
+        .weaknesses-list li::before {
+            content: '\\f00d'; /* Font Awesome times icon */
+            color: var(--brag-red);
+        }
+
+
+        /* Quotes */
+        .quote-text {
+            font-style: italic;
+            padding: 1.5rem; /* More padding */
+            padding-left: 3.5rem; /* More Space for quote mark */
+            background-color: #444444;
+            border-left: 5px solid var(--brag-red); /* Accent border */
+            border-radius: var(--border-radius);
+            margin: 1.5rem 0;
+            position: relative;
+            color: rgba(255, 255, 255, 0.9);
+            flex-grow: 1; /* Allow quote to fill space if needed */
+            margin-top: auto; /* Push quote towards bottom if content is short */
+        }
+
+        .quote-text::before {
+            content: '\\f10d'; /* Font Awesome quote-left icon */
+            font-size: 2rem; /* Larger quote icon */
+            position: absolute; /* Keep absolute */
+            top: 1rem;
+            left: 0.75rem;
+            color: var(--brag-red);
+            opacity: 0.6;
+            /* font-family and font-weight inherited from common rule above */
+        }
+
+        /* Key Takeaways Grid */
+        .report-takeaways-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Slightly larger min width */
+            gap: 1.5rem;
+            align-items: stretch; /* Make grid items same height */
+        }
+
+        /* Footer */
+        .report-footer {
+            background-color: var(--dark-gray);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 2rem 2rem; /* Match container padding */
+            text-align: center;
+            margin: 2rem -2rem 0; /* Extend footer to container edges, add space above */
+            border-bottom-left-radius: var(--border-radius); /* Match container radius */
+            border-bottom-right-radius: var(--border-radius); /* Match container radius */
+            font-size: 0.9rem;
+        }
+        /* --- End Report Preview Styles --- */
+
+    </style>
+</head>
+<body>
+    <div class="container generator-container">
+        <div class="generator-header">
+            <h1>UX Battle Report Generator</h1>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="content">1. Report Content</div>
+            <div class="tab" data-tab="platforms">2. Platforms</div>
+            <div class="tab" data-tab="metrics">3. Metrics</div>
+            <div class="tab" data-tab="heuristics">4. Heuristics</div>
+            <div class="tab" data-tab="preview">5. Preview & Download</div>
+        </div>
+
+        <div class="tab-content active" id="content-tab">
+            <h2 class="section-title">Basic Report Information</h2>
+
+            <div class="form-group">
+                <label for="reportTitle">Report Title</label>
+                <input type="text" id="reportTitle" placeholder="UX Battle: Platform A vs. Platform B vs. Platform C" value="UX Battle: Zerodha vs. Dhan vs. Upstox">
+            </div>
+
+            <div class="form-group">
+                <label for="reportSubtitle">Report Subtitle</label>
+                <input type="text" id="reportSubtitle" placeholder="An in-depth analysis of..." value="An in-depth analysis of India's top trading platforms through the lens of user experience.">
+            </div>
+
+            <div class="form-group">
+                <label for="introText">Introduction Text (supports basic HTML like &lt;br&gt;)</label>
+                <textarea id="introText">In India's booming retail investment space, trading platforms have become utilities — not just tools. However, while features are largely comparable across apps, user experience is now the true differentiator.<br><br>BRAG conducted a deep heuristic and behavioral usability study of India's three biggest trading platforms.</textarea>
+            </div>
+
+            <div class="section-container">
+                <h3 class="section-title">Methodology</h3>
+
+                <div class="form-group">
+                    <label for="sampleSize">Sample Size</label>
+                    <input type="text" id="sampleSize" placeholder="e.g., 150 participants" value="150 participants (Tier 1 + Tier 2 cities)">
+                </div>
+
+                <div class="form-group">
+                    <label for="ageGroup">Age Group</label>
+                    <input type="text" id="ageGroup" placeholder="e.g., 20-38 years" value="20–38 years">
+                </div>
+
+                <div class="form-group">
+                    <label for="toolsUsed">Tools Used</label>
+                    <input type="text" id="toolsUsed" placeholder="e.g., Tool A, Tool B, Tool C" value="Maze, Useberry, Attention Insight, Lookback">
+                </div>
+
+                <div class="form-group">
+                    <label for="testTasks">Test Tasks (comma separated)</label>
+                    <input type="text" id="testTasks" placeholder="e.g., Task 1, Task 2, Task 3" value="Buy a stock, Check P&L, Add funds">
+                </div>
+
+                <div class="form-group">
+                    <label for="evaluationFramework">Evaluation Framework</label>
+                    <input type="text" id="evaluationFramework" placeholder="e.g., Framework A + Framework B" value="Nielsen's 10 Heuristics + BRAG's Friction Map">
+                </div>
+            </div>
+
+            <div class="actions-container">
+                <button class="btn" onclick="goToTab('platforms')">Next: Platforms <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="platforms-tab">
+            <h2 class="section-title">Platforms</h2>
+            <p class="mb-4">Add the platforms you want to compare in your UX battle report.</p>
+
+            <div id="brokers-container">
+                </div>
+
+            <button class="btn btn-outline mb-4" onclick="addBroker()"><i class="fas fa-plus"></i> Add Platform</button>
+
+            <div class="actions-container">
+                <button class="btn btn-secondary" onclick="goToTab('content')"><i class="fas fa-arrow-left"></i> Previous</button>
+                <button class="btn" onclick="goToTab('metrics')">Next: Metrics <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="metrics-tab">
+             <h2 class="section-title">Quantitative Metrics</h2>
+            <p class="mb-4">Add metrics to compare platforms quantitatively. Values should correspond to the platforms added in the previous step, in the same order.</p>
+
+            <div id="metrics-container">
+                </div>
+
+            <button class="btn btn-outline mb-4" onclick="addMetric()"><i class="fas fa-plus"></i> Add Metric</button>
+
+            <div class="actions-container">
+                <button class="btn btn-secondary" onclick="goToTab('platforms')"><i class="fas fa-arrow-left"></i> Previous</button>
+                <button class="btn" onclick="goToTab('heuristics')">Next: Heuristics <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="heuristics-tab">
+             <h2 class="section-title">Heuristic Breakdown</h2>
+            <p class="mb-4">Add heuristics to evaluate platforms qualitatively. Evaluations should correspond to the platforms added, in the same order.</p>
+
+            <div id="heuristics-container">
+                </div>
+
+            <button class="btn btn-outline mb-4" onclick="addHeuristic()"><i class="fas fa-plus"></i> Add Heuristic</button>
+
+            <div class="actions-container">
+                <button class="btn btn-secondary" onclick="goToTab('metrics')"><i class="fas fa-arrow-left"></i> Previous</button>
+                <button class="btn" onclick="goToTab('preview')">Next: Preview <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="preview-tab">
+            <h2 class="section-title">Preview & Download</h2>
+
+            <div class="preview-actions">
+                <button class="btn" onclick="generateReport()"><i class="fas fa-sync-alt"></i> Generate/Refresh Preview</button>
+                <button class="btn btn-outline" id="download-html-btn" onclick="downloadHTML()" disabled><i class="fas fa-file-code"></i> Download HTML</button>
+                <button class="btn btn-outline" id="download-pdf-btn" onclick="downloadPDF()" disabled><i class="fas fa-file-pdf"></i> Download PDF</button>
+            </div>
+             <div id="pdf-loading" style="display: none; margin-top: 1rem; color: var(--brag-red);">
+                 <i class="fas fa-spinner fa-spin"></i> Generating PDF, please wait...
+             </div>
+
+            <div class="preview-container" id="preview-content">
+                <p>Click "Generate/Refresh Preview" to see the report.</p>
+            </div>
+
+            <div class="actions-container">
+                <button class="btn btn-secondary" onclick="goToTab('heuristics')"><i class="fas fa-arrow-left"></i> Previous</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Global Data Storage (Read from DOM before generation) ---
+        // We don't need global JS arrays to store the state anymore.
+        // We will read directly from the DOM when generating the report.
+
+        // --- DOM Elements ---
+        const previewContent = document.getElementById('preview-content');
+        const downloadHtmlBtn = document.getElementById('download-html-btn');
+        const downloadPdfBtn = document.getElementById('download-pdf-btn');
+        const pdfLoadingIndicator = document.getElementById('pdf-loading');
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add default brokers
+            addBroker('Zerodha', 'India\'s largest discount broker',
+                     'Fastest task completion\nCleanest visual hierarchy\nFew distractions', // Use newline for textarea
+                     'Poor for new users — Lack of visual onboarding\nHidden features need 3+ taps',
+                     'I know what I\'m doing here — but I wouldn\'t give this to my dad to figure out.');
+
+            addBroker('Dhan', 'UX-first newer entrant',
+                     'Clear discoverability\nPersistent help cues',
+                     'Too many action buttons\nAlert center UX secondary',
+                     'Nice design but feels a bit cramped. I like the help bubbles though.');
+
+            addBroker('Upstox', 'VC-backed with mass reach',
+                     'Friendly branding\nGreat personalization potential',
+                     'Highest error rate\nBanner-heavy UI',
+                     'Why are there banners inside my trade screen? It\'s distracting.');
+
+            // Add default metrics (values correspond to brokers above)
+            addMetric('Avg. Task Completion Time', 'sec', ['47', '53', '66']);
+            addMetric('Error Rate', '%', ['7.1', '9.5', '15.4']);
+            addMetric('Time to First Action', 'sec', ['4.2', '3.8', '5.9']);
+            addMetric('Task Confidence', '/10', ['8.1', '7.6', '6.2']);
+            addMetric('Feature Discoverability', '', ['Medium', 'High', 'Low']);
+
+            // Add default heuristics (evaluations correspond to brokers above)
+            addHeuristic('Recognition vs Recall', ['Strong – Icons are familiar', 'Strong – Good onboarding tooltips', 'Weak – Too many similar icons']);
+            addHeuristic('Aesthetic & Minimal Design', ['Very Minimal', 'Clean but dense', 'Cluttered, ad-heavy']);
+            addHeuristic('Visibility of System Status', ['Excellent', 'Good', 'Fair (delayed feedback)']);
+            addHeuristic('User Control & Freedom', ['Weak – limited undo', 'Strong – Clear exit points', 'Fair – Back actions unclear']);
+            addHeuristic('Consistency & Standards', ['Strong', 'Moderate', 'Moderate']);
+
+            // Activate the first tab
+            goToTab('content'); // Ensure the first tab is active on load
+        });
+
+        // --- Tab Navigation ---
+        function goToTab(tabId) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to the clicked tab and corresponding content
+            const activeTab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+            const activeContent = document.getElementById(`${tabId}-tab`);
+
+            if (activeTab) activeTab.classList.add('active');
+            if (activeContent) activeContent.classList.add('active');
+
+            // Special handling for metrics/heuristics tabs: refresh inputs if brokers changed
+             if (tabId === 'metrics') refreshMetricInputs();
+             if (tabId === 'heuristics') refreshHeuristicInputs();
+        }
+
+        // Add event listeners to tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                goToTab(tab.getAttribute('data-tab'));
+            });
+        });
+
+        // --- Dynamic Item Management ---
+
+        // Helper to get current broker data from the DOM
+        function getCurrentBrokersFromDOM() {
+            const brokers = [];
+            document.querySelectorAll('#brokers-container .broker-item').forEach((item, index) => {
+                brokers.push({
+                    id: item.dataset.id || `broker_${index}`, // Assign temporary ID if needed
+                    name: item.querySelector('.broker-name')?.value || 'Unnamed Platform',
+                    description: item.querySelector('.broker-description')?.value || '',
+                    strengths: item.querySelector('.broker-strengths')?.value || '',
+                    weaknesses: item.querySelector('.broker-weaknesses')?.value || '',
+                    quote: item.querySelector('.broker-quote')?.value || ''
+                });
+            });
+            return brokers;
+        }
+
+
+        // Add Broker/Platform
+        function addBroker(name = '', description = '', strengths = '', weaknesses = '', quote = '') {
+            const brokerId = `broker_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`; // More unique ID
+            const brokerItem = document.createElement('div');
+            brokerItem.className = 'broker-item';
+            brokerItem.dataset.id = brokerId; // Use data attribute for ID
+
+            brokerItem.innerHTML = `
+                <button type="button" class="remove-btn" onclick="removeBroker('${brokerId}')" title="Remove Platform">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="form-group">
+                    <label for="broker-name-${brokerId}">Platform Name</label>
+                    <input type="text" id="broker-name-${brokerId}" class="broker-name" value="${escapeHtml(name)}" placeholder="e.g., Platform A">
+                </div>
+                <div class="form-group">
+                    <label for="broker-desc-${brokerId}">Description</label>
+                    <input type="text" id="broker-desc-${brokerId}" class="broker-description" value="${escapeHtml(description)}" placeholder="e.g., Market leader with advanced features">
+                </div>
+                <div class="form-group">
+                    <label for="broker-strengths-${brokerId}">Strengths (one per line)</label>
+                    <textarea id="broker-strengths-${brokerId}" class="broker-strengths" placeholder="List the platform's strengths">${escapeHtml(strengths)}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="broker-weaknesses-${brokerId}">Weaknesses (one per line)</label>
+                    <textarea id="broker-weaknesses-${brokerId}" class="broker-weaknesses" placeholder="List the platform's weaknesses">${escapeHtml(weaknesses)}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="broker-quote-${brokerId}">User Quote</label>
+                    <textarea id="broker-quote-${brokerId}" class="broker-quote" placeholder="A representative user quote">${escapeHtml(quote)}</textarea>
+                </div>
+            `;
+
+            document.getElementById('brokers-container').appendChild(brokerItem);
+            // No need to update a global array here
+        }
+
+        function removeBroker(brokerId) {
+            const itemToRemove = document.querySelector(`.broker-item[data-id="${brokerId}"]`);
+            if (itemToRemove) {
+                itemToRemove.remove();
+            }
+            // No need to update a global array here
+        }
+
+        // Add Metric
+        function addMetric(name = '', unit = '', values = []) {
+             const metricId = `metric_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+             const metricItem = document.createElement('div');
+             metricItem.className = 'metric-item';
+             metricItem.dataset.id = metricId;
+
+             const currentBrokers = getCurrentBrokersFromDOM(); // Get brokers currently in the DOM
+
+             let platformInputsHTML = '<div class="metric-values-container">'; // Container for values
+             currentBrokers.forEach((broker, index) => {
+                 const value = values[index] || ''; // Get corresponding value or default to empty
+                 platformInputsHTML += `
+                     <div class="form-group">
+                         <label for="metric-${metricId}-broker-${broker.id}">${escapeHtml(broker.name)} (${escapeHtml(name)})</label>
+                         <input type="text" id="metric-${metricId}-broker-${broker.id}" class="metric-value" data-broker-id="${broker.id}" value="${escapeHtml(value)}" placeholder="Value for ${escapeHtml(broker.name)}">
+                     </div>
+                 `;
+             });
+             platformInputsHTML += '</div>';
+
+             metricItem.innerHTML = `
+                 <button type="button" class="remove-btn" onclick="removeMetric('${metricId}')" title="Remove Metric">
+                     <i class="fas fa-times"></i>
+                 </button>
+                 <div class="form-group">
+                     <label for="metric-name-${metricId}">Metric Name</label>
+                     <input type="text" id="metric-name-${metricId}" class="metric-name" value="${escapeHtml(name)}" placeholder="e.g., Success Rate">
+                 </div>
+                 <div class="form-group">
+                     <label for="metric-unit-${metricId}">Unit (optional)</label>
+                     <input type="text" id="metric-unit-${metricId}" class="metric-unit" value="${escapeHtml(unit)}" placeholder="e.g., %, sec, etc.">
+                 </div>
+                 ${platformInputsHTML}
+             `;
+
+             document.getElementById('metrics-container').appendChild(metricItem);
+         }
+
+        function removeMetric(metricId) {
+            const itemToRemove = document.querySelector(`.metric-item[data-id="${metricId}"]`);
+            if (itemToRemove) {
+                itemToRemove.remove();
+            }
+        }
+
+        // Add Heuristic
+        function addHeuristic(name = '', evaluations = []) {
+             const heuristicId = `heuristic_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+             const heuristicItem = document.createElement('div');
+             heuristicItem.className = 'heuristic-item';
+             heuristicItem.dataset.id = heuristicId;
+
+             const currentBrokers = getCurrentBrokersFromDOM(); // Get brokers currently in the DOM
+
+             let platformInputsHTML = '<div class="heuristic-evaluations-container">'; // Container
+             currentBrokers.forEach((broker, index) => {
+                 const evaluation = evaluations[index] || ''; // Get corresponding evaluation or default
+                 platformInputsHTML += `
+                     <div class="form-group">
+                         <label for="heuristic-${heuristicId}-broker-${broker.id}">${escapeHtml(broker.name)} Evaluation</label>
+                         <input type="text" id="heuristic-${heuristicId}-broker-${broker.id}" class="heuristic-evaluation" data-broker-id="${broker.id}" value="${escapeHtml(evaluation)}" placeholder="Evaluation for ${escapeHtml(broker.name)}">
+                     </div>
+                 `;
+             });
+              platformInputsHTML += '</div>';
+
+             heuristicItem.innerHTML = `
+                 <button type="button" class="remove-btn" onclick="removeHeuristic('${heuristicId}')" title="Remove Heuristic">
+                     <i class="fas fa-times"></i>
+                 </button>
+                 <div class="form-group">
+                     <label for="heuristic-name-${heuristicId}">Heuristic Name</label>
+                     <input type="text" id="heuristic-name-${heuristicId}" class="heuristic-name" value="${escapeHtml(name)}" placeholder="e.g., Error Prevention">
+                 </div>
+                 ${platformInputsHTML}
+             `;
+
+             document.getElementById('heuristics-container').appendChild(heuristicItem);
+         }
+
+        function removeHeuristic(heuristicId) {
+            const itemToRemove = document.querySelector(`.heuristic-item[data-id="${heuristicId}"]`);
+            if (itemToRemove) {
+                itemToRemove.remove();
+            }
+        }
+
+        // Functions to refresh metric/heuristic inputs if brokers change
+        function refreshMetricInputs() {
+            const currentBrokers = getCurrentBrokersFromDOM();
+            document.querySelectorAll('.metric-item').forEach(metricItem => {
+                const metricId = metricItem.dataset.id;
+                const metricName = metricItem.querySelector('.metric-name')?.value || '';
+                const valuesContainer = metricItem.querySelector('.metric-values-container');
+                if (!valuesContainer) return;
+
+                // Store existing values
+                const existingValues = {};
+                metricItem.querySelectorAll('.metric-value').forEach(input => {
+                    existingValues[input.dataset.brokerId] = input.value;
+                });
+
+                // Rebuild inputs
+                let newInputsHTML = '';
+                currentBrokers.forEach(broker => {
+                    const value = existingValues[broker.id] || ''; // Keep existing value if broker still exists
+                     newInputsHTML += `
+                        <div class="form-group">
+                            <label for="metric-${metricId}-broker-${broker.id}">${escapeHtml(broker.name)} (${escapeHtml(metricName)})</label>
+                            <input type="text" id="metric-${metricId}-broker-${broker.id}" class="metric-value" data-broker-id="${broker.id}" value="${escapeHtml(value)}" placeholder="Value for ${escapeHtml(broker.name)}">
+                        </div>
+                    `;
+                });
+                valuesContainer.innerHTML = newInputsHTML;
+            });
+        }
+
+        function refreshHeuristicInputs() {
+             const currentBrokers = getCurrentBrokersFromDOM();
+             document.querySelectorAll('.heuristic-item').forEach(heuristicItem => {
+                 const heuristicId = heuristicItem.dataset.id;
+                 const evaluationsContainer = heuristicItem.querySelector('.heuristic-evaluations-container');
+                 if (!evaluationsContainer) return;
+
+                 // Store existing evaluations
+                 const existingEvals = {};
+                 heuristicItem.querySelectorAll('.heuristic-evaluation').forEach(input => {
+                     existingEvals[input.dataset.brokerId] = input.value;
+                 });
+
+                 // Rebuild inputs
+                 let newInputsHTML = '';
+                 currentBrokers.forEach(broker => {
+                     const evaluation = existingEvals[broker.id] || ''; // Keep existing value
+                     newInputsHTML += `
+                         <div class="form-group">
+                             <label for="heuristic-${heuristicId}-broker-${broker.id}">${escapeHtml(broker.name)} Evaluation</label>
+                             <input type="text" id="heuristic-${heuristicId}-broker-${broker.id}" class="heuristic-evaluation" data-broker-id="${broker.id}" value="${escapeHtml(evaluation)}" placeholder="Evaluation for ${escapeHtml(broker.name)}">
+                         </div>
+                     `;
+                 });
+                 evaluationsContainer.innerHTML = newInputsHTML;
+             });
+         }
+
+
+        // --- Report Generation and Download ---
+
+        // Helper function to get all form data
+        function getReportData() {
+            const data = {};
+
+            // Basic Info
+            data.reportTitle = document.getElementById('reportTitle')?.value || 'UX Battle Report';
+            data.reportSubtitle = document.getElementById('reportSubtitle')?.value || '';
+            data.introText = document.getElementById('introText')?.value || ''; // Keep potential HTML like <br>
+
+            // Methodology
+            data.methodology = {
+                sampleSize: document.getElementById('sampleSize')?.value || 'N/A',
+                ageGroup: document.getElementById('ageGroup')?.value || 'N/A',
+                toolsUsed: document.getElementById('toolsUsed')?.value || 'N/A',
+                testTasks: (document.getElementById('testTasks')?.value || '').split(',').map(t => t.trim()).filter(t => t),
+                evaluationFramework: document.getElementById('evaluationFramework')?.value || 'N/A'
+            };
+
+            // Platforms (Brokers)
+            data.brokers = getCurrentBrokersFromDOM(); // Use helper to read from DOM
+
+            // Metrics
+            data.metrics = [];
+            document.querySelectorAll('#metrics-container .metric-item').forEach(item => {
+                const metric = {
+                    id: item.dataset.id,
+                    name: item.querySelector('.metric-name')?.value || 'Unnamed Metric',
+                    unit: item.querySelector('.metric-unit')?.value || '',
+                    values: [] // { brokerId: '...', brokerName: '...', value: '...' }
+                };
+                item.querySelectorAll('.metric-value').forEach(input => {
+                    const brokerId = input.dataset.brokerId;
+                    // Find broker name using brokerId (important for report display)
+                    const broker = data.brokers.find(b => b.id === brokerId);
+                    metric.values.push({
+                        brokerId: brokerId,
+                        brokerName: broker ? broker.name : 'Unknown Platform', // Add name for convenience
+                        value: input.value || ''
+                    });
+                });
+                 // Ensure values are in the same order as brokers for table generation
+                 metric.values.sort((a, b) => {
+                     const indexA = data.brokers.findIndex(broker => broker.id === a.brokerId);
+                     const indexB = data.brokers.findIndex(broker => broker.id === b.brokerId);
+                     return indexA - indexB;
+                 });
+                data.metrics.push(metric);
+            });
+
+            // Heuristics
+            data.heuristics = [];
+            document.querySelectorAll('#heuristics-container .heuristic-item').forEach(item => {
+                const heuristic = {
+                    id: item.dataset.id,
+                    name: item.querySelector('.heuristic-name')?.value || 'Unnamed Heuristic',
+                    evaluations: [] // { brokerId: '...', brokerName: '...', evaluation: '...' }
+                };
+                item.querySelectorAll('.heuristic-evaluation').forEach(input => {
+                     const brokerId = input.dataset.brokerId;
+                     const broker = data.brokers.find(b => b.id === brokerId);
+                     heuristic.evaluations.push({
+                         brokerId: brokerId,
+                         brokerName: broker ? broker.name : 'Unknown Platform',
+                         evaluation: input.value || ''
+                     });
+                });
+                 // Ensure evaluations are in the same order as brokers
+                 heuristic.evaluations.sort((a, b) => {
+                     const indexA = data.brokers.findIndex(broker => broker.id === a.brokerId);
+                     const indexB = data.brokers.findIndex(broker => broker.id === b.brokerId);
+                     return indexA - indexB;
+                 });
+                data.heuristics.push(heuristic);
+            });
+
+            return data;
+        }
+
+        // Generate Report HTML
+        function generateReport() {
+            console.log("Generating report...");
+            const data = getReportData();
+            console.log("Data collected:", data);
+
+            // --- Build HTML String ---
+            // (HTML structure remains the same as before, only CSS was changed)
+            let reportHtml = `
+            <div class="report-container">
+                <div class="report-header">
+                    <div class="report-logo">BRAG</div>
+                    <h1 class="report-main-title">${escapeHtml(data.reportTitle)}</h1>
+                    <p class="report-subtitle">${escapeHtml(data.reportSubtitle)}</p>
+                </div>
+
+                <div class="report-section">
+                    <h2 class="report-title">Introduction</h2>
+                    <p>${data.introText.replace(/\n/g, '<br>')}</p>
+                </div>
+
+                <div class="report-section">
+                    <h2 class="report-title">Methodology</h2>
+                    <div class="report-methodology-container">
+                        <div class="report-methodology-item">
+                            <div class="report-methodology-icon"><i class="fas fa-users"></i></div>
+                            <div class="report-methodology-content"><h4>Sample Size</h4><p>${escapeHtml(data.methodology.sampleSize)}</p></div>
+                        </div>
+                        <div class="report-methodology-item">
+                            <div class="report-methodology-icon"><i class="fas fa-birthday-cake"></i></div>
+                            <div class="report-methodology-content"><h4>Age Group</h4><p>${escapeHtml(data.methodology.ageGroup)}</p></div>
+                        </div>
+                        <div class="report-methodology-item">
+                            <div class="report-methodology-icon"><i class="fas fa-tools"></i></div>
+                            <div class="report-methodology-content"><h4>Tools Used</h4><p>${escapeHtml(data.methodology.toolsUsed)}</p></div>
+                        </div>
+                         <div class="report-methodology-item">
+                            <div class="report-methodology-icon"><i class="fas fa-tasks"></i></div>
+                            <div class="report-methodology-content"><h4>Test Tasks</h4><p>${data.methodology.testTasks.length > 0 ? data.methodology.testTasks.map(escapeHtml).join(', ') : 'N/A'}</p></div>
+                        </div>
+                         <div class="report-methodology-item">
+                            <div class="report-methodology-icon"><i class="fas fa-clipboard-check"></i></div>
+                            <div class="report-methodology-content"><h4>Evaluation Framework</h4><p>${escapeHtml(data.methodology.evaluationFramework)}</p></div>
+                        </div>
+                    </div>
+                </div>`;
+
+            // Quantitative Metrics Table
+            if (data.metrics.length > 0 && data.brokers.length > 0) {
+                reportHtml += `
+                <div class="report-section">
+                    <h2 class="report-title">Quantitative Metrics</h2>
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                ${data.brokers.map(broker => `<th>${escapeHtml(broker.name)}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.metrics.map(metric => `
+                                <tr>
+                                    <td>${escapeHtml(metric.name)} ${metric.unit ? `(${escapeHtml(metric.unit)})` : ''}</td>
+                                    ${metric.values.map(val => `<td>${escapeHtml(val.value)}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+            }
+
+             // Heuristic Breakdown Table
+            if (data.heuristics.length > 0 && data.brokers.length > 0) {
+                reportHtml += `
+                <div class="report-section">
+                    <h2 class="report-title">Heuristic Breakdown</h2>
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Heuristic</th>
+                                ${data.brokers.map(broker => `<th>${escapeHtml(broker.name)}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.heuristics.map(heuristic => `
+                                <tr>
+                                    <td>${escapeHtml(heuristic.name)}</td>
+                                    ${heuristic.evaluations.map(ev => `<td>${escapeHtml(ev.evaluation)}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+            }
+
+            // Platform Deep Dive (Strengths, Weaknesses, Quotes)
+            if (data.brokers.length > 0) {
+                reportHtml += `
+                <div class="report-section">
+                    <h2 class="report-title">Platform Deep Dive</h2>
+                    <div class="report-takeaways-grid">
+                    ${data.brokers.map(broker => `
+                        <div class="report-card report-broker-card">
+                             <div class="report-broker-name">${escapeHtml(broker.name)}</div>
+                             <p><em>${escapeHtml(broker.description)}</em></p>
+
+                            ${broker.strengths ? `
+                            <div class="broker-strengths">
+                                <span class="strengths-label">Strengths</span>
+                                <ul class="strengths-list">
+                                    ${broker.strengths.split('\n').map(s => s.trim()).filter(s => s).map(s => `<li>${escapeHtml(s)}</li>`).join('')}
+                                </ul>
+                            </div>` : ''}
+
+                             ${broker.weaknesses ? `
+                            <div class="broker-weaknesses">
+                                <span class="weaknesses-label">Weaknesses</span>
+                                <ul class="weaknesses-list">
+                                     ${broker.weaknesses.split('\n').map(w => w.trim()).filter(w => w).map(w => `<li>${escapeHtml(w)}</li>`).join('')}
+                                </ul>
+                            </div>` : ''}
+
+                            ${broker.quote ? `<div class="quote-text">${escapeHtml(broker.quote)}</div>` : ''}
+                        </div>
+                    `).join('')}
+                    </div>
+                </div>`;
+            }
+
+            // Footer
+            reportHtml += `
+                <div class="report-footer">
+                    Generated by BRAG UX Battle Report Generator &copy; ${new Date().getFullYear()}
+                </div>
+            </div>`; // Close report-container
+
+
+            // --- Update Preview ---
+            previewContent.innerHTML = reportHtml;
+
+            // Enable download buttons
+            downloadHtmlBtn.disabled = false;
+            downloadPdfBtn.disabled = false;
+
+            console.log("Report generated and preview updated.");
+        }
+
+        // Download HTML
+        function downloadHTML() {
+            if (downloadHtmlBtn.disabled) return; // Don't run if disabled
+
+            const reportFullHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${escapeHtml(document.getElementById('reportTitle')?.value || "Report")}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Inject all the report styles defined in the main <style> block */
+        ${Array.from(document.styleSheets)
+            .map(sheet => {
+                try {
+                    // Check if rules are accessible (avoid CORS issues with external sheets if any)
+                    return Array.from(sheet.cssRules || [])
+                        .map(rule => rule.cssText || '')
+                        .join('\n');
+                } catch (e) {
+                    console.warn("Could not access rules from stylesheet:", sheet.href, e);
+                    return '';
+                }
+            })
+            .join('\n')
+            .match(/\/\* --- Report Preview Styles --- \*\/([\s\S]*?)\/\* --- End Report Preview Styles --- \*\//)?.[1] || ''
+        }
+    </style>
+</head>
+<body class="report-body">
+    ${previewContent.innerHTML}
+</body>
+</html>`;
+
+            const blob = new Blob([reportFullHtml], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${(document.getElementById('reportTitle')?.value || 'report').replace(/[^a-z0-9]/gi, '_').toLowerCase()}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            console.log("HTML download initiated.");
+        }
+
+        // Download PDF using html2pdf.js
+        function downloadPDF() {
+            if (downloadPdfBtn.disabled || !window.html2pdf) {
+                console.error("PDF download button disabled or html2pdf library not loaded.");
+                return;
+            }
+
+            // Select the element to print (the container with the page boundary)
+            const reportElement = previewContent.querySelector('.report-container');
+            if (!reportElement) {
+                console.error("Report content container not found for PDF generation.");
+                alert("Could not find report content to generate PDF. Please generate the preview first.");
+                return;
+            }
+
+            // Clone the element to avoid modifying the preview
+            const elementToPrint = reportElement.cloneNode(true);
+
+            // --- Options for html2pdf ---
+             const pdfOptions = {
+                 margin:       [0.5, 0.25, 0.5, 0.25], // Margins in inches [top, left, bottom, right] - Reduced side margins slightly
+                 filename:     `${(document.getElementById('reportTitle')?.value || 'report').replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`,
+                 image:        { type: 'jpeg', quality: 0.98 }, // Image settings
+                 html2canvas:  {
+                     scale: 2, // Higher scale for better resolution
+                     logging: false, // Disable extensive logging
+                     useCORS: true, // Enable CORS if using external images
+                     scrollX: 0, // Ensure capture starts at the top-left
+                     scrollY: -window.scrollY // Account for page scroll if any
+                 },
+                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }, // PDF settings
+                 pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // Page break handling
+             };
+
+            // Disable button and show loading indicator
+            downloadPdfBtn.disabled = true;
+            downloadHtmlBtn.disabled = true; // Also disable HTML download during PDF generation
+            pdfLoadingIndicator.style.display = 'block';
+            console.log("Starting PDF generation...");
+
+            // --- Generate PDF ---
+             html2pdf().from(elementToPrint).set(pdfOptions).save()
+                 .then(() => {
+                     console.log("PDF generated successfully.");
+                 })
+                 .catch(err => {
+                     console.error("Error generating PDF:", err);
+                     alert("An error occurred while generating the PDF. Please check the console for details.");
+                 })
+                 .finally(() => {
+                     // Re-enable buttons and hide loading indicator
+                     downloadPdfBtn.disabled = false;
+                     downloadHtmlBtn.disabled = false;
+                     pdfLoadingIndicator.style.display = 'none';
+                     console.log("PDF generation process finished.");
+                 });
+        }
+
+        // --- Utility Functions ---
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') return unsafe;
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+    </script>
+
+</body>
+</html>
