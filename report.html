@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UX Battle Report Generator</title>
+    <title>BRAG Report Generator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* Root variables for theme */
+        /* --- Global Styles & Variables --- */
         :root {
-            --brag-red: #E53935; /* Material Red 600 */
-            --brag-dark-red: #C62828; /* Material Red 800 */
-            --brag-light-red: #FFCDD2; /* Material Red 100 */
+            --brag-red: #D32F2F; /* Slightly darker red for primary */
+            --brag-dark-red: #B71C1C; /* Darker shade */
+            --brag-light-red: #FFCDD2; /* Lighter shade */
             --dark-gray: #333333;
-            --medium-gray: #757575;
-            --light-gray: #F5F5F5;
+            --medium-gray: #666666; /* Adjusted medium gray */
+            --light-gray: #F1F1F1; /* Lighter gray for backgrounds/borders */
+            --very-light-gray: #FAFAFA;
             --white: #FFFFFF;
-            --border-radius: 8px;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --border-radius: 6px; /* Slightly smaller radius */
+            --shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* Softer shadow */
         }
 
-        /* Basic reset and font */
         * {
             margin: 0;
             padding: 0;
@@ -29,1364 +30,1803 @@
         }
 
         body {
+            background-color: #f4f5f7; /* Slightly off-white background */
+            color: var(--dark-gray);
             line-height: 1.6;
-            color: var(--dark-gray);
-            background-color: #f0f0f0; /* Light background for the page */
+            font-size: 16px;
         }
 
-        .container {
+        h1, h2, h3, h4 {
+            color: var(--dark-gray);
+            margin-bottom: 0.6em;
+            line-height: 1.3; /* Adjust line height for headings */
+        }
+        h1 { font-size: 2rem; font-weight: 600;}
+        h2 { font-size: 1.6rem; font-weight: 600;}
+        h3 { font-size: 1.3rem; font-weight: 600;}
+        h4 { font-size: 1.1rem; font-weight: 600;}
+
+        /* --- Layout Containers --- */
+        .form-container {
             max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+            margin: 30px auto; /* Increased margin */
+            padding: 0 20px; /* Remove vertical padding, keep horizontal */
         }
 
-        /* Generator Styles */
-        .generator-container {
-            background-color: var(--white);
+        .header {
+            background: linear-gradient(to right, var(--brag-red), var(--brag-dark-red)); /* Gradient header */
+            color: white;
+            padding: 25px 30px; /* Increased padding */
             border-radius: var(--border-radius);
+            margin-bottom: 30px; /* Increased spacing */
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: white;
+            margin-bottom: 8px;
+            font-size: 2.2rem;
+        }
+        .header p {
+            color: rgba(255, 255, 255, 0.85); /* Slightly transparent subtitle */
+            font-size: 1.1rem;
+        }
+
+        .form-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 30px; /* Increased padding */
+            margin-bottom: 25px; /* Adjusted spacing */
             box-shadow: var(--shadow);
-            margin: 2rem auto;
-            overflow: hidden;
+            border: 1px solid var(--light-gray); /* Subtle border */
         }
 
-        .generator-header {
-            background-color: var(--brag-red);
-            color: var(--white);
-            padding: 1.5rem;
-        }
-
-        .generator-header h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            text-align: center;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            background-color: var(--light-gray);
-            border-bottom: 1px solid #ddd;
-        }
-
-        .tab {
-            padding: 1rem 1.5rem;
-            cursor: pointer;
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 25px; /* Increased spacing */
+            padding-bottom: 12px; /* Increased padding */
+            border-bottom: 2px solid var(--brag-red); /* Use primary red */
+            color: var(--brag-red); /* Use primary red */
             font-weight: 600;
-            transition: background-color 0.3s ease, border-bottom-color 0.3s ease;
-            border-bottom: 3px solid transparent;
-            color: var(--medium-gray);
-            text-align: center;
-            flex-grow: 1; /* Make tabs share space */
         }
 
-        .tab:hover {
-             background-color: #e0e0e0;
+        /* --- Form Elements --- */
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px; /* Increased spacing */
+            gap: 25px; /* Increased gap */
         }
 
-        .tab.active {
-            background-color: var(--white);
-            border-bottom-color: var(--brag-red);
-            color: var(--dark-gray);
-        }
-
-        .tab-content {
-            display: none;
-            padding: 2rem;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Form Elements */
         .form-group {
-            margin-bottom: 1.5rem;
+            flex: 1 1 300px;
+            margin-bottom: 10px; /* Reduced margin within group */
         }
 
         label {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--dark-gray);
+            margin-bottom: 8px;
+            font-weight: 500; /* Medium weight labels */
+            color: var(--medium-gray);
+            font-size: 0.95rem;
         }
 
-        input[type="text"], textarea, select {
+        input[type="text"],
+        input[type="url"], /* Style URL inputs */
+        input[type="color"],
+        textarea,
+        select {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
+            padding: 12px 14px; /* Adjusted padding */
+            border: 1px solid #ccc; /* Slightly darker border */
+            border-radius: 4px;
             font-size: 1rem;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background-color: var(--white);
         }
-         input[type="text"]:focus, textarea:focus, select:focus {
-             border-color: var(--brag-red);
-             box-shadow: 0 0 0 2px var(--brag-light-red);
-             outline: none;
-         }
+        input[type="text"]:focus,
+        input[type="url"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--brag-red);
+            box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15); /* Red focus shadow */
+        }
 
         textarea {
-            min-height: 100px;
+            min-height: 120px; /* Increased min-height */
             resize: vertical;
         }
 
-        /* Buttons */
-        .btn {
+        /* --- Buttons --- */
+        button {
+            background-color: var(--brag-red);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 12px 22px; /* Increased padding */
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
             display: inline-flex;
             align-items: center;
-            justify-content: center; /* Center content */
-            padding: 0.75rem 1.5rem;
-            background-color: var(--brag-red);
-            color: var(--white);
-            text-decoration: none;
-            border: none;
-            border-radius: var(--border-radius);
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            gap: 0.5rem; /* Space between icon and text */
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow on buttons */
         }
 
-        .btn:hover {
+        button:hover {
             background-color: var(--brag-dark-red);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
-        .btn:active {
+        button:active {
             transform: scale(0.98);
+            box-shadow: none;
+        }
+        button:disabled { /* Style for disabled button */
+            background-color: var(--medium-gray);
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.7;
         }
 
-        .btn-outline {
-            background-color: transparent;
-            border: 2px solid var(--brag-red);
-            color: var(--brag-red);
-        }
 
-        .btn-outline:hover {
-            background-color: var(--brag-light-red);
-            color: var(--brag-dark-red);
-        }
-
-        .btn-secondary {
-            background-color: var(--dark-gray);
-            color: var(--white);
-        }
-
-        .btn-secondary:hover {
-            background-color: #444;
-        }
-
-        /* Dynamic Item Sections */
-        .section-container {
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            background-color: #fafafa; /* Slightly different background */
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--brag-red);
-            margin-bottom: 1rem;
+        .button-container {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 35px; /* Increased spacing */
+        }
+
+        /* --- Dynamic Lists (Add/Remove Items) --- */
+        .add-item-btn {
+            font-size: 0.9rem;
+            padding: 8px 14px; /* Adjusted padding */
+            margin-top: 10px;
+            background-color: #2E7D32; /* Darker green */
+        }
+         .add-item-btn:hover {
+             background-color: #1B5E20; /* Even darker green */
+         }
+
+        .dynamic-list {
+            margin: 15px 0;
+            padding-left: 0; /* Remove indent */
+            border-left: none; /* Remove border */
+        }
+
+        .item-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px; /* Increased spacing */
             align-items: center;
+            padding: 5px 0; /* Add some vertical padding */
         }
 
-        .broker-item, .metric-item, .heuristic-item {
-            background-color: var(--light-gray);
-            border-radius: var(--border-radius);
-            padding: 1.5rem; /* Increased padding */
-            margin-bottom: 1rem;
-            position: relative;
-            border: 1px solid #e0e0e0;
+        .item-row input[type="text"],
+        .item-row input[type="url"] {
+             flex-grow: 1;
+             margin-bottom: 0;
         }
 
-        .remove-btn {
-            position: absolute;
-            top: 0.75rem; /* Adjusted position */
-            right: 0.75rem; /* Adjusted position */
-            background: none;
+        .remove-item {
+            background-color: #D32F2F; /* Match primary red */
+            color: white;
             border: none;
-            color: var(--brag-red);
+            border-radius: 50%;
+            width: 26px; /* Adjusted size */
+            height: 26px; /* Adjusted size */
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            transition: background-color 0.2s ease;
-        }
-
-        .remove-btn:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        /* Action Buttons Container */
-        .actions-container {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid #eee; /* Separator line */
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-        }
-
-        /* Preview Area */
-        .preview-container {
-            padding: 1rem;
-            margin-top: 1rem; /* Add space above preview */
-            overflow: auto; /* Allow scrolling if content overflows */
-            max-height: 800px; /* Limit height */
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-        }
-
-        .preview-actions {
-            margin-bottom: 1rem;
-            display: flex;
-            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-            gap: 1rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .tabs {
-                flex-direction: column;
-            }
-            .tab {
-                border-bottom-width: 1px; /* Adjust border for column layout */
-            }
-             .tab.active {
-                 border-bottom-color: #ddd; /* Use standard border color */
-                 border-left: 3px solid var(--brag-red); /* Use left border for active tab */
-             }
-            .actions-container {
-                flex-direction: column;
-                align-items: stretch; /* Make buttons full width */
-            }
-            .preview-actions {
-                flex-direction: column;
-                align-items: stretch; /* Make buttons full width */
-            }
-            .btn {
-                width: 100%; /* Make buttons full width */
-            }
-        }
-
-        /* --- Report Preview Styles --- */
-        /* These styles are injected into the generated report */
-        .report-styles {
-            /* Styles defined here will be added to the <head> of the downloaded HTML */
-            /* and used by html2pdf */
-            --brag-red: #E53935;
-            --brag-dark-red: #C62828;
-            --white: #FFFFFF;
-            --dark-gray: #333333;
-            --border-radius: 8px;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: rgba(255, 255, 255, 0.85); /* Default text color for dark theme - Increased contrast */
-        }
-
-        .report-body {
-            background-color: #222222; /* Dark background for the report */
-            margin: 0;
-            padding: 0;
-        }
-
-        /* --- FIX: Page Boundary --- */
-        .report-container {
-            max-width: 900px; /* Max width for the report content */
-            margin: 2rem auto; /* Center the report with VERTICAL margin */
-            padding: 0 2rem; /* Padding on the sides (increased slightly) */
-            background-color: #282828; /* Slightly lighter than body for subtle page effect */
-            border: 1px solid #444; /* Subtle border */
-            border-radius: var(--border-radius); /* Rounded corners for the page */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Subtle shadow for depth */
-            overflow: hidden; /* Ensure content respects border radius */
-        }
-
-        .report-header {
-            background-color: var(--brag-red);
-            color: var(--white);
-            padding: 3rem 2rem; /* Adjusted padding to match container */
-            margin: 0 -2rem; /* Extend header to container edges */
-            margin-bottom: 2rem; /* Space below header */
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            border-bottom: 5px solid var(--brag-dark-red);
-            border-top-left-radius: var(--border-radius); /* Match container radius */
-            border-top-right-radius: var(--border-radius); /* Match container radius */
-        }
-
-        /* Subtle pattern for header */
-        .report-header::before {
-            content: '';
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M10 10 H90 V90 H10 Z" fill="none" stroke="%23FFFFFF" stroke-width="0.5" opacity="0.05"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23FFFFFF" stroke-width="0.5" opacity="0.05"/></svg>');
-            opacity: 0.5;
-            z-index: 0;
-        }
-
-        .report-header > * {
-            position: relative; /* Ensure content is above the pattern */
-            z-index: 1;
-        }
-
-        .report-logo { /* Can be used for a logo text/element if needed */
-            font-weight: 900;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background-color: var(--white);
-            color: var(--brag-red);
-            border-radius: var(--border-radius);
-        }
-
-        .report-main-title {
-            font-size: 2.5rem; /* Larger title */
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-             color: var(--white); /* Ensure title is white */
-        }
-        .report-subtitle {
-            font-size: 1.2rem;
-            font-weight: 300;
-            color: rgba(255, 255, 255, 0.9); /* Slightly brighter subtitle */
-        }
-
-        .report-section {
-            padding: 2rem 0; /* Reduced vertical padding slightly */
-            border-bottom: 1px solid #444444; /* Separator */
-        }
-        .report-section:last-of-type { /* Use last-of-type for better targeting */
-            border-bottom: none; /* No border for the last section */
-            padding-bottom: 0; /* Remove bottom padding on last section */
-        }
-
-        .report-section p { /* Improve default paragraph contrast */
-             color: rgba(255, 255, 255, 0.85);
-             margin-bottom: 1rem; /* Add space below paragraphs */
-        }
-
-        .report-card {
-            background-color: #333333;
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow);
-            border: 1px solid #444; /* Subtle border */
-        }
-
-        /* Methodology Grid */
-        .report-methodology-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
-            gap: 1.5rem;
-        }
-
-        .report-methodology-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1rem;
-            background-color: #444; /* Slightly different background */
-            border-radius: var(--border-radius);
-        }
-
-        .report-methodology-icon {
-            background-color: var(--brag-red);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--white);
-            font-size: 1.5rem;
             flex-shrink: 0;
+            font-size: 1rem;
+            line-height: 1;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: none; /* Remove shadow from remove buttons */
         }
-        .report-methodology-content h4 {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            color: var(--white);
-        }
-        .report-methodology-content p {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8); /* Lighter text for methodology details */
-            margin-bottom: 0; /* Reset margin for methodology p */
-        }
-
-        .report-title { /* Section titles */
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--white);
-            position: relative;
-            display: inline-block;
-            padding-bottom: 0.5rem; /* Space for the underline */
-        }
-
-        .report-title::after { /* Underline effect */
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 60px;
-            height: 4px;
-            background-color: var(--brag-red);
-            border-radius: 2px;
-        }
-
-        /* Tables */
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            color: var(--white);
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-            border-radius: var(--border-radius);
-            overflow: hidden; /* Clip corners */
-        }
-
-        .report-table thead {
-            background-color: var(--brag-red);
-            color: var(--white);
-            font-weight: 600;
-        }
-
-        .report-table th, .report-table td {
-            padding: 0.75rem 1rem;
-            border: 1px solid #444444;
-            color: rgba(255, 255, 255, 0.9); /* Lighter text in table cells */
-            vertical-align: top; /* Align content top */
-        }
-
-        .report-table th {
-             color: var(--white); /* Ensure header text is white */
-        }
-
-        .report-table tbody tr {
-             background-color: #333;
-             transition: background-color 0.2s ease;
-        }
-         .report-table tbody tr:hover {
-             background-color: #404040;
-         }
-
-        .report-table tbody tr:nth-child(even) {
-            background-color: #2A2A2A;
-        }
-         .report-table tbody tr:nth-child(even):hover {
-             background-color: #353535;
-         }
-
-        /* --- FIX: Platform Deep Dive UI --- */
-         .report-broker-card {
-            position: relative;
-            padding: 2rem; /* Increased padding inside card */
-            padding-top: 3rem; /* More space for the name tag */
-            margin-top: 1.5rem; /* Add space above the card */
-            background-color: #3a3a3a; /* Slightly different card background */
-            display: flex; /* Use flexbox for better internal layout */
-            flex-direction: column; /* Stack elements vertically */
-            height: 100%; /* Make cards in grid same height */
-         }
-         .report-broker-card p em { /* Ensure description text is lighter */
-             color: rgba(255, 255, 255, 0.8);
-             display: block; /* Make description block */
-             margin-bottom: 1.5rem; /* Space after description */
-         }
-
-        .report-broker-name {
-            position: absolute;
-            top: -15px; /* Position above the card */
-            left: 20px;
-            background-color: var(--brag-red);
-            color: var(--white);
-            padding: 0.5rem 1rem;
-            border-radius: var(--border-radius);
-            font-weight: 600;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 2; /* Ensure tag is above card content */
-        }
-
-        .broker-strengths, .broker-weaknesses {
-            margin-bottom: 1.5rem; /* More space between sections */
-        }
-
-        .strengths-label, .weaknesses-label {
-            display: block; /* Ensure label is on its own line */
-            font-weight: 600;
-            margin-bottom: 0.75rem; /* Increased space below label */
-            font-size: 1.1rem; /* Slightly larger label */
-        }
-
-        .strengths-label {
-            color: #4CAF50; /* Green for strengths */
-        }
-
-        .weaknesses-label {
-            color: var(--brag-red); /* Red for weaknesses */
-        }
-
-        .strengths-list, .weaknesses-list {
-            list-style: none; /* Remove default bullets */
-            padding-left: 0;
-        }
-        .strengths-list li, .weaknesses-list li {
-            padding-left: 1.8em; /* Increased indent text */
-            position: relative;
-            margin-bottom: 0.6rem; /* Increased space between items */
-            color: rgba(255, 255, 255, 0.85); /* Lighter list item text */
-            line-height: 1.5; /* Improve line spacing */
-        }
-
-        /* Fix for Icons (already applied in v2, ensure it's correct) */
-        .strengths-list li::before,
-        .weaknesses-list li::before,
-        .quote-text::before {
-            display: inline-block; /* Needed for font awesome */
-            font-style: normal;
-            font-variant: normal;
-            text-rendering: auto;
-            -webkit-font-smoothing: antialiased;
-            font-family: 'Font Awesome 6 Free'; /* Ensure Font Awesome is applied */
-            font-weight: 900; /* Use solid style */
-            position: absolute;
-            left: 0;
-            top: 0.1em; /* Adjust vertical alignment */
-        }
-
-        .strengths-list li::before {
-            content: '\\f00c'; /* Font Awesome check icon */
-            color: #4CAF50;
-        }
-        .weaknesses-list li::before {
-            content: '\\f00d'; /* Font Awesome times icon */
-            color: var(--brag-red);
+        .remove-item:hover {
+            background-color: #B71C1C; /* Darker red */
+            transform: scale(1.1);
         }
 
 
-        /* Quotes */
-        .quote-text {
-            font-style: italic;
-            padding: 1.5rem; /* More padding */
-            padding-left: 3.5rem; /* More Space for quote mark */
-            background-color: #444444;
-            border-left: 5px solid var(--brag-red); /* Accent border */
-            border-radius: var(--border-radius);
-            margin: 1.5rem 0;
-            position: relative;
-            color: rgba(255, 255, 255, 0.9);
-            flex-grow: 1; /* Allow quote to fill space if needed */
-            margin-top: auto; /* Push quote towards bottom if content is short */
-        }
-
-        .quote-text::before {
-            content: '\\f10d'; /* Font Awesome quote-left icon */
-            font-size: 2rem; /* Larger quote icon */
-            position: absolute; /* Keep absolute */
-            top: 1rem;
-            left: 0.75rem;
-            color: var(--brag-red);
-            opacity: 0.6;
-            /* font-family and font-weight inherited from common rule above */
-        }
-
-        /* Key Takeaways Grid */
-        .report-takeaways-grid {
+        /* --- Metrics & Heuristics Grid --- */
+        .metric-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Slightly larger min width */
-            gap: 1.5rem;
-            align-items: stretch; /* Make grid items same height */
+            grid-template-columns: minmax(150px, 2fr) repeat(3, minmax(100px, 1fr)) auto;
+            gap: 15px;
+            margin-bottom: 0; /* Remove bottom margin */
+            padding: 10px 5px; /* Increased padding, less horizontal */
+            align-items: center;
+            border-bottom: 1px solid var(--light-gray); /* Lighter border */
+        }
+         /* Alternating row colors */
+         #metricsList .metric-row:nth-child(even),
+         #heuristicsList .metric-row:nth-child(even) {
+            background-color: var(--very-light-gray);
+         }
+
+        .metric-row:last-child {
+            border-bottom: none;
         }
 
-        /* Footer */
-        .report-footer {
-            background-color: var(--dark-gray);
-            color: rgba(255, 255, 255, 0.7);
-            padding: 2rem 2rem; /* Match container padding */
-            text-align: center;
-            margin: 2rem -2rem 0; /* Extend footer to container edges, add space above */
-            border-bottom-left-radius: var(--border-radius); /* Match container radius */
-            border-bottom-right-radius: var(--border-radius); /* Match container radius */
-            font-size: 0.9rem;
+        .metric-row-header {
+            font-weight: 600;
+            margin-bottom: 5px; /* Reduced space */
+            color: var(--dark-gray); /* Darker header text */
+            border-bottom: 2px solid var(--medium-gray); /* Medium gray border */
+            padding-bottom: 8px;
+            background-color: transparent; /* Ensure header has no bg */
         }
-        /* --- End Report Preview Styles --- */
+         .metric-row-header div {
+             padding: 0 5px;
+             font-size: 0.9rem; /* Smaller header font */
+             text-transform: uppercase; /* Uppercase headers */
+             letter-spacing: 0.5px;
+         }
+         .metric-row input[type="text"] {
+             margin-bottom: 0;
+             font-size: 0.95rem; /* Slightly smaller input text */
+         }
+
+        /* --- UX Takeaways Section --- */
+        .takeaway-company-section {
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            padding: 25px; /* Increased padding */
+            margin-bottom: 30px; /* Increased spacing */
+            background-color: var(--white); /* White background */
+            box-shadow: var(--shadow);
+        }
+
+        .takeaway-company-section h3 {
+             font-size: 1.4rem; /* Slightly larger */
+             margin-bottom: 20px; /* Increased space */
+             color: var(--brag-red); /* ** UPDATED: Use Red for Takeaway H3 ** */
+             border-bottom: 1px solid var(--brag-light-red);
+             padding-bottom: 10px;
+        }
+         .takeaway-details-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px; /* Increased gap */
+            margin-bottom: 20px; /* Increased space */
+         }
+         @media screen and (min-width: 768px) {
+             .takeaway-details-grid {
+                 grid-template-columns: 1fr 1fr; /* Strengths | Weaknesses */
+             }
+         }
+
+        .takeaway-group label {
+            font-weight: 600; /* Bold label */
+            margin-bottom: 10px;
+            display: block;
+            color: var(--dark-gray);
+            font-size: 1rem; /* Larger label */
+         }
+
+         .takeaway-group .dynamic-list {
+             margin-top: 5px;
+             margin-bottom: 10px;
+             padding-left: 0;
+             border-left: none;
+         }
+         .takeaway-group .dynamic-list .item-row {
+             margin-bottom: 8px;
+             padding: 0; /* Remove padding */
+         }
+         .takeaway-group .add-item-btn {
+             margin-top: 5px;
+         }
+         .takeaway-quote-group label {
+             font-weight: 600;
+             font-size: 1rem;
+             margin-bottom: 10px;
+         }
+         .takeaway-quote {
+            font-style: normal; /* Not italic by default */
+            border-left: 4px solid var(--brag-red); /* Red border */
+            padding: 15px 20px; /* Increased padding */
+            margin: 10px 0 0 0;
+            color: var(--dark-gray);
+            background-color: var(--very-light-gray); /* Light gray background */
+            border-radius: 0 4px 4px 0;
+            display: block;
+            position: relative; /* For quotes */
+            font-size: 1rem;
+         }
+         .takeaway-quote::before {
+             content: '“';
+             position: absolute;
+             left: -10px;
+             top: 0px;
+             font-size: 3em;
+             color: var(--brag-light-red);
+             line-height: 1;
+             font-family: Georgia, serif;
+         }
+
+        /* --- Image Comparison Section --- */
+        .image-comparison-set {
+            border: 1px dashed var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative; /* For remove button positioning */
+        }
+        .image-comparison-set .remove-set-btn { /* Specific remove button for the set */
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--medium-gray);
+        }
+        .image-comparison-set .remove-set-btn:hover {
+            background-color: var(--dark-gray);
+        }
+        .image-inputs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+
+        /* --- Preview Modal --- */
+        .preview-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75); /* Darker overlay */
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            padding: 30px; /* Increased padding */
+        }
+
+        .preview-content {
+            background-color: white;
+            width: 90%;
+            max-width: 900px; /* Slightly narrower for professional feel */
+            border-radius: var(--border-radius);
+            overflow: visible; /* Allow shadows to show */
+            position: relative;
+            padding: 40px 50px; /* More internal padding */
+            color: var(--dark-gray);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15); /* Softer shadow */
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+         /* --- Styles for GENERATED PREVIEW content --- */
+         .preview-content .report-logo { /* Style for logo */
+             display: block;
+             max-height: 60px; /* Limit logo height */
+             width: auto; /* Maintain aspect ratio */
+             margin: 0 auto 25px auto; /* Center logo */
+         }
+         .preview-content h1, .preview-content h2 { /* Main headings */
+             color: var(--brag-red);
+             margin-bottom: 0.8em;
+             font-weight: 600;
+             padding-bottom: 0.3em;
+             border-bottom: 1px solid var(--light-gray);
+         }
+         .preview-content h3 { /* Sub-section headings like company names */
+             color: var(--brag-red); /* ** UPDATED: Use Red for Takeaway H3 ** */
+             margin-bottom: 0.8em;
+             font-weight: 600;
+             padding-bottom: 0.3em;
+             border-bottom: 1px solid var(--light-gray);
+             font-size: 1.25em;
+             margin-top: 1.5em;
+         }
+
+         .preview-content h1 {
+             font-size: 2em;
+             text-align: center;
+             border-bottom: 2px solid var(--brag-red);
+             margin-bottom: 1em;
+         }
+         .preview-content h2 {
+             font-size: 1.5em;
+             margin-top: 2em;
+         }
+         /* H3 was already updated above */
+         .preview-content .report-subtitle {
+             text-align: center;
+             font-size: 1.1em;
+             color: var(--medium-gray);
+             margin-top: -0.8em;
+             margin-bottom: 2.5em;
+         }
+
+         .preview-content p, .preview-content ul {
+              margin-bottom: 1.2em;
+              line-height: 1.7;
+              font-size: 1rem;
+              color: var(--dark-gray);
+          }
+         .preview-content ul {
+             list-style-position: outside;
+             padding-left: 1.5em;
+         }
+         .preview-content li { margin-bottom: 0.5em; }
+
+         /* Table Styling */
+         .preview-content table {
+             width: 100%;
+             border-collapse: collapse;
+             margin: 1.5em 0;
+             font-size: 0.95rem;
+             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+         }
+         .preview-content th, .preview-content td {
+             border: 1px solid #e0e0e0;
+             padding: 12px 15px;
+             text-align: left;
+             vertical-align: top;
+         }
+         .preview-content th {
+             background-color: var(--light-gray);
+             font-weight: 600; /* ** UPDATED: Bold table headers ** */
+             color: var(--dark-gray); /* ** UPDATED: Dark gray for table headers ** */
+             text-transform: uppercase;
+             font-size: 0.85rem;
+             letter-spacing: 0.5px;
+         }
+         /* Make first column header slightly less prominent */
+         .preview-content th:first-child {
+             font-weight: 500;
+             color: var(--medium-gray);
+         }
+         .preview-content tbody tr:nth-child(even) {
+             background-color: var(--very-light-gray);
+         }
+
+         /* Quote Styling */
+         .preview-content .quote {
+             font-style: normal;
+             border-left: 4px solid var(--brag-red);
+             padding: 15px 20px 15px 30px;
+             margin: 1.5em 0 1.5em 1em;
+             color: var(--medium-gray);
+             background-color: var(--very-light-gray);
+             border-radius: 0 4px 4px 0;
+             position: relative;
+             font-size: 1rem;
+         }
+          .preview-content .quote::before {
+             content: '“';
+             position: absolute;
+             left: 5px;
+             top: 5px;
+             font-size: 2.5em;
+             color: var(--brag-light-red);
+             line-height: 1;
+             font-family: Georgia, serif;
+         }
+
+         /* Chart Container Styling */
+         .preview-content .chart-container {
+             margin: 2.5em auto;
+             padding: 25px;
+             border: 1px solid var(--light-gray);
+             border-radius: var(--border-radius);
+             max-width: 750px;
+             /* Removed fixed height */
+             /* height: 400px; */
+             position: relative;
+             background-color: var(--white);
+             box-shadow: var(--shadow);
+         }
+         .preview-content .chart-container h2 {
+             margin-top: 0;
+             margin-bottom: 1.5em;
+             text-align: center;
+             font-size: 1.3em;
+             border-bottom: none;
+             color: var(--dark-gray);
+         }
+         .preview-content .chart-container canvas {
+             max-width: 100%;
+             max-height: 400px; /* Limit chart height visually */
+             /* Let chart.js manage canvas size */
+         }
+
+         /* Image Comparison Styling */
+         .preview-content .image-comparison-section {
+             margin-top: 2em;
+         }
+         .preview-content .image-comparison-item {
+             margin-bottom: 2em;
+             page-break-inside: avoid; /* Hint for PDF generation */
+         }
+         .preview-content .image-comparison-item h3 { /* Caption style */
+             text-align: center;
+             margin-bottom: 1em;
+             font-size: 1.1em;
+             color: var(--medium-gray);
+             border-bottom: none; /* No border for image caption */
+         }
+         .preview-content .image-comparison-grid {
+             display: flex;
+             flex-wrap: wrap;
+             gap: 15px;
+             justify-content: center; /* Center images */
+             align-items: flex-start; /* Align tops */
+         }
+         .preview-content .image-comparison-grid figure {
+             flex: 1 1 250px; /* Allow wrapping */
+             margin: 0;
+             text-align: center;
+             max-width: 30%; /* Limit width */
+         }
+         .preview-content .image-comparison-grid img {
+             max-width: 100%;
+             height: auto;
+             border: 1px solid var(--light-gray);
+             border-radius: 4px;
+             margin-bottom: 0.5em;
+             box-shadow: var(--shadow);
+         }
+          .preview-content .image-comparison-grid figcaption {
+             font-size: 0.9em;
+             color: var(--medium-gray);
+          }
+         .preview-content .image-error-placeholder { /* Style for broken image */
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             height: 150px; /* Example height */
+             width: 100%;
+             background-color: var(--light-gray);
+             border: 1px dashed var(--medium-gray);
+             color: var(--medium-gray);
+             font-size: 0.9em;
+             border-radius: 4px;
+             text-align: center;
+             padding: 10px;
+         }
+
+
+        .close-preview {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background-color: var(--medium-gray);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+         .close-preview:hover {
+             background-color: var(--dark-gray);
+             transform: rotate(90deg) scale(1.1);
+         }
+
+        /* --- Tabs --- */
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background-color: transparent;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            margin-right: 5px;
+            margin-bottom: -1px;
+            border: 1px solid transparent;
+            border-bottom: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--medium-gray);
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .tab.active {
+            background-color: white;
+            color: var(--brag-red);
+            border-color: #ccc;
+            border-bottom: 1px solid white;
+            font-weight: 600;
+        }
+         .tab:hover:not(.active) {
+             background-color: var(--light-gray);
+             color: var(--dark-gray);
+         }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* --- Responsive Styles --- */
+        @media screen and (max-width: 992px) {
+             .metric-row {
+                 grid-template-columns: minmax(120px, 1.5fr) repeat(3, minmax(80px, 1fr)) auto;
+                 gap: 10px;
+             }
+             /* .preview-content .chart-container { height: 350px; } */ /* Removed fixed height */
+             .preview-content { padding: 30px 40px; }
+             .image-inputs-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+             .preview-content .image-comparison-grid figure { max-width: 45%; }
+        }
+
+        @media screen and (max-width: 768px) {
+            body { font-size: 15px; }
+            .form-container { padding: 0 15px; margin: 20px auto; }
+            .form-section { padding: 25px; }
+            .form-row { flex-direction: column; gap: 0; }
+            .form-group { margin-bottom: 20px; }
+
+            .metric-row {
+                grid-template-columns: 1fr; gap: 10px; border-bottom: none;
+                padding: 15px 0; border-top: 1px solid var(--light-gray);
+            }
+             .metric-row:first-child { border-top: none; }
+            .metric-row-header { display: none; }
+             .metric-row input { margin-bottom: 5px; }
+             .metric-row input[name$="Values[]"]::before {
+                 content: attr(data-company-label); display: block; font-size: 0.8em;
+                 font-weight: bold; color: var(--medium-gray); margin-bottom: 3px;
+             }
+             .metric-row input[name="metricNames[]"]::before,
+             .metric-row input[name="heuristicNames[]"]::before {
+                 content: "Metric/Heuristic Name"; display: block; font-size: 0.8em;
+                 font-weight: bold; color: var(--medium-gray); margin-bottom: 3px;
+             }
+             .metric-row .remove-item { margin-top: 10px; align-self: flex-end; }
+
+             .preview-content { width: 95%; padding: 25px 30px; max-height: 85vh; }
+             .tabs { justify-content: flex-start; }
+             .tab { padding: 10px 15px; }
+             /* .preview-content .chart-container { height: 300px; } */ /* Removed fixed height */
+             .preview-content h1 { font-size: 1.8em; }
+             .preview-content h2 { font-size: 1.4em; }
+             .preview-content h3 { font-size: 1.15em; }
+             .image-inputs-grid { grid-template-columns: 1fr; } /* Stack image inputs */
+             .preview-content .image-comparison-grid figure { max-width: 80%; } /* Allow larger images when stacked */
+        }
+        @media screen and (max-width: 480px) {
+            body { font-size: 14px; }
+            .header h1 { font-size: 1.6rem; }
+            .header p { font-size: 1rem; }
+            .section-title { font-size: 1.3rem; }
+            button { font-size: 0.9rem; padding: 10px 18px; }
+            .add-item-btn { font-size: 0.8rem; padding: 6px 12px;}
+            .remove-item { width: 24px; height: 24px; font-size: 0.9rem; }
+            .preview-content { padding: 20px 25px; }
+             .takeaway-details-grid { grid-template-columns: 1fr; }
+             /* .preview-content .chart-container { height: 250px; padding: 15px; } */ /* Removed fixed height */
+             .preview-content th, .preview-content td { padding: 8px 10px; }
+             .preview-content .quote { margin-left: 0.5em; padding: 12px 15px 12px 25px; }
+             .preview-content .quote::before { left: 2px; font-size: 2em; }
+             .preview-content .image-comparison-grid figure { max-width: 100%; } /* Full width on smallest screens */
+        }
+
+        /* --- PDF Specific Styles (applied temporarily during PDF generation) --- */
+        /* These styles target elements *within* the previewContentArea when .pdf-styles is applied to body */
+        .pdf-styles * { /* Ensure box-sizing for PDF context */
+            box-sizing: border-box;
+        }
+        .pdf-styles .preview-content {
+            font-family: 'Inter', sans-serif; line-height: 1.5; color: #333; font-size: 10pt;
+            /* === MODIFICATION: Significantly Increased LEFT padding === */
+            padding: 15pt 15pt 15pt 55pt !important; /* top, right, bottom, LEFT (increased to 55pt) */
+            border: 1pt solid var(--dark-gray) !important; /* Keep the border */
+            box-shadow: none !important;
+            max-width: none !important;
+            width: 100% !important; max-height: none !important; overflow: visible !important;
+            border-radius: 0 !important;
+            background-color: #fff !important;
+        }
+        .pdf-styles .preview-content h1,
+        .pdf-styles .preview-content h2,
+        .pdf-styles .preview-content h3 { color: #B71C1C; margin: 1.2em 0 0.6em 0; padding-bottom: 3pt; border-bottom: 1px solid #eee; } /* Slightly reduced padding-bottom */
+        .pdf-styles .preview-content .report-logo { max-height: 40pt; margin: 0 auto 15pt auto; display: block; }
+        .pdf-styles .preview-content h1 { font-size: 18pt; text-align: center; margin-bottom: 8pt; border-bottom: 2px solid #B71C1C;} /* Slightly smaller H1 */
+        .pdf-styles .preview-content .report-subtitle { text-align: center; font-size: 10pt; color: #666; margin-top: -4pt; margin-bottom: 15pt; } /* Slightly smaller/less margin */
+        .pdf-styles .preview-content h2 { font-size: 14pt; margin-top: 15pt; } /* Slightly smaller H2 */
+        .pdf-styles .preview-content h3 { font-size: 11pt; margin-top: 10pt; border-bottom: none; color: #B71C1C;} /* Slightly smaller H3 */
+        .pdf-styles .preview-content .takeaway-company-section h3 {
+             font-size: 11pt; margin-top: 10pt; border-bottom: 1px solid #FFCDD2 !important; color: #B71C1C; padding-bottom: 4pt; /* Reduced padding */
+         }
+        .pdf-styles .preview-content p,
+        .pdf-styles .preview-content ul { margin-bottom: 8pt; font-size: 9.5pt; line-height: 1.45; } /* Slightly smaller font/line-height/margin */
+        .pdf-styles .preview-content ul { list-style: disc; padding-left: 15pt; } /* Reduced list padding */
+        .pdf-styles .preview-content li { margin-bottom: 2pt; /* Added word-wrap */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .pdf-styles .preview-content p { /* Added word-wrap */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .pdf-styles .preview-content table { width: 100%; border-collapse: collapse; page-break-inside: avoid; margin: 10pt 0; } /* Reduced margin */
+        .pdf-styles .preview-content th,
+        .pdf-styles .preview-content td {
+            border: 1px solid #ddd; padding: 4pt 5pt; /* Reduced padding */ text-align: left; font-size: 7.5pt; vertical-align: top;
+            /* Added word-wrap */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .pdf-styles .preview-content th { background-color: #f2f2f2; font-weight: bold; color: #333; text-transform: uppercase; font-size: 7pt;} /* Slightly smaller TH font */
+        .pdf-styles .preview-content tbody tr:nth-child(even) { background-color: #fafafa; }
+        .pdf-styles .preview-content .quote { font-style: normal; border-left: 3px solid #FFCDD2; padding: 6pt 10pt; /* Reduced padding */ margin: 10pt 0 10pt 0.5em; /* Reduced margin */ color: #555; background-color: #f9f9f9; page-break-inside: avoid; font-size: 9.5pt;
+            /* Added word-wrap */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .pdf-styles .preview-content .quote::before { display: none; }
+        .pdf-styles .preview-content .chart-container { page-break-inside: avoid; text-align: center; margin: 15pt auto; /* Reduced margin */ max-width: 450pt; /* Slightly reduced max-width */ padding: 8pt; /* Reduced padding */ border: 1px solid #eee; background: #fff; box-shadow: none; }
+        .pdf-styles .preview-content .chart-container h2 { font-size: 12pt; text-align: center; margin-bottom: 10pt; /* Reduced margin */ border-bottom: none;}
+        .pdf-styles .preview-content .chart-container canvas { max-height: 220pt !important; width: auto !important; } /* Reduced max-height */
+        .pdf-styles .preview-content .image-comparison-section { margin-top: 15pt; page-break-inside: avoid; } /* Reduced margin */
+        .pdf-styles .preview-content .image-comparison-item { margin-bottom: 15pt; page-break-inside: avoid; } /* Reduced margin */
+        .pdf-styles .preview-content .image-comparison-item h3 { font-size: 10pt; text-align: center; margin-bottom: 6pt; /* Reduced margin */ color: #666; border-bottom: none; }
+        .pdf-styles .preview-content .image-comparison-grid { display: flex; gap: 8pt; /* Reduced gap */ justify-content: center; align-items: flex-start; }
+        .pdf-styles .preview-content .image-comparison-grid figure { flex: 1; margin: 0; text-align: center; max-width: 31%; } /* Adjust as needed */
+        .pdf-styles .preview-content .image-comparison-grid img { max-width: 100%; height: auto; border: 1px solid #eee; margin-bottom: 3pt; /* Reduced margin */ box-shadow: none;}
+        .pdf-styles .preview-content .image-comparison-grid figcaption { font-size: 7.5pt; color: #666;
+            /* Added word-wrap */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .pdf-styles .preview-content .image-error-placeholder { height: 80pt; background-color: #f0f0f0; border: 1px dashed #ccc; color: #888; font-size: 7pt; display: flex; align-items: center; justify-content: center; text-align: center; padding: 4pt; } /* Reduced height/font */
+        .pdf-styles .page-break { page-break-before: always; }
+        .pdf-styles .no-print { display: none; }
+
+        /* Ensure preview container itself is hidden during PDF generation if needed, but content inside is used */
+        .pdf-generation-active .preview-container {
+            opacity: 0;
+            pointer-events: none;
+        }
 
     </style>
 </head>
 <body>
-    <div class="container generator-container">
-        <div class="generator-header">
-            <h1>UX Battle Report Generator</h1>
+    <div class="form-container">
+        <div class="header">
+            <h1>BRAG Report Generator</h1>
+            <p>Create a customized UX comparison report with your own data</p>
         </div>
 
         <div class="tabs">
-            <div class="tab active" data-tab="content">1. Report Content</div>
-            <div class="tab" data-tab="platforms">2. Platforms</div>
-            <div class="tab" data-tab="metrics">3. Metrics</div>
-            <div class="tab" data-tab="heuristics">4. Heuristics</div>
-            <div class="tab" data-tab="preview">5. Preview & Download</div>
-        </div>
-
-        <div class="tab-content active" id="content-tab">
-            <h2 class="section-title">Basic Report Information</h2>
-
-            <div class="form-group">
-                <label for="reportTitle">Report Title</label>
-                <input type="text" id="reportTitle" placeholder="UX Battle: Platform A vs. Platform B vs. Platform C" value="UX Battle: Zerodha vs. Dhan vs. Upstox">
+            <button class="tab active" data-tab="edit-form">Edit Form</button>
             </div>
 
-            <div class="form-group">
-                <label for="reportSubtitle">Report Subtitle</label>
-                <input type="text" id="reportSubtitle" placeholder="An in-depth analysis of..." value="An in-depth analysis of India's top trading platforms through the lens of user experience.">
-            </div>
-
-            <div class="form-group">
-                <label for="introText">Introduction Text (supports basic HTML like &lt;br&gt;)</label>
-                <textarea id="introText">In India's booming retail investment space, trading platforms have become utilities — not just tools. However, while features are largely comparable across apps, user experience is now the true differentiator.<br><br>BRAG conducted a deep heuristic and behavioral usability study of India's three biggest trading platforms.</textarea>
-            </div>
-
-            <div class="section-container">
-                <h3 class="section-title">Methodology</h3>
-
-                <div class="form-group">
-                    <label for="sampleSize">Sample Size</label>
-                    <input type="text" id="sampleSize" placeholder="e.g., 150 participants" value="150 participants (Tier 1 + Tier 2 cities)">
+        <div class="tab-content active" id="edit-form">
+            <form id="reportForm">
+                <div class="form-section">
+                    <h2 class="section-title">Report Header</h2>
+                     <div class="form-group"> <label for="reportLogoUrl">Logo URL (Optional)</label>
+                        <input type="url" id="reportLogoUrl" name="reportLogoUrl" placeholder="https://example.com/logo.png">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reportTitle">Report Title</label>
+                            <input type="text" id="reportTitle" name="reportTitle" value="UX Battle: Zerodha vs. Dhan vs. Upstox – BRAG Insight Report">
+                        </div>
+                        <div class="form-group">
+                            <label for="subtitle">Subtitle</label>
+                            <input type="text" id="subtitle" name="subtitle" value="An in-depth analysis of India's top trading platforms through the lens of user experience.">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="ageGroup">Age Group</label>
-                    <input type="text" id="ageGroup" placeholder="e.g., 20-38 years" value="20–38 years">
+                <div class="form-section">
+                    <h2 class="section-title">Introduction</h2>
+                    <div class="form-group">
+                        <label for="introduction">Introduction Text</label>
+                        <textarea id="introduction" name="introduction">In India's booming retail investment space, trading platforms have become utilities — not just tools. However, while features are largely comparable across apps, user experience is now the true differentiator.</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Companies/Products to Compare (Max 3)</label>
+                        <div id="companiesList" class="dynamic-list">
+                            </div>
+                        <button type="button" id="addCompany" class="add-item-btn">
+                            <i class="fas fa-plus"></i> Add Company
+                        </button>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="toolsUsed">Tools Used</label>
-                    <input type="text" id="toolsUsed" placeholder="e.g., Tool A, Tool B, Tool C" value="Maze, Useberry, Attention Insight, Lookback">
+                <div class="form-section">
+                    <h2 class="section-title">Methodology</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sampleSize">Sample Size</label>
+                            <input type="text" id="sampleSize" name="sampleSize" value="150 participants (Tier 1 + Tier 2 cities)">
+                        </div>
+                        <div class="form-group">
+                            <label for="ageGroup">Age Group</label>
+                            <input type="text" id="ageGroup" name="ageGroup" value="20–38 years">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="toolsUsed">Tools Used</label>
+                            <input type="text" id="toolsUsed" name="toolsUsed" value="Maze, Useberry, Attention Insight, Lookback">
+                        </div>
+                        <div class="form-group">
+                            <label for="evaluationFramework">Evaluation Framework</label>
+                            <input type="text" id="evaluationFramework" name="evaluationFramework" value="Nielsen's 10 Heuristics + BRAG's Friction Map">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Test Tasks</label>
+                        <div id="tasksList" class="dynamic-list">
+                             <div class="item-row">
+                                <input type="text" name="tasks[]" value="Buy a stock">
+                                <button type="button" class="remove-item" aria-label="Remove Task">&times;</button>
+                            </div>
+                            <div class="item-row">
+                                <input type="text" name="tasks[]" value="Check P&L">
+                                <button type="button" class="remove-item" aria-label="Remove Task">&times;</button>
+                            </div>
+                            <div class="item-row">
+                                <input type="text" name="tasks[]" value="Add funds">
+                                <button type="button" class="remove-item" aria-label="Remove Task">&times;</button>
+                            </div>
+                        </div>
+                        <button type="button" id="addTask" class="add-item-btn">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="testTasks">Test Tasks (comma separated)</label>
-                    <input type="text" id="testTasks" placeholder="e.g., Task 1, Task 2, Task 3" value="Buy a stock, Check P&L, Add funds">
+                <div class="form-section">
+                    <h2 class="section-title">Quantitative Metrics</h2>
+                    <p>Enter numerical values consistently for accurate charting (e.g., use only numbers for time, percentages, scores).</p>
+                    <div class="metric-row metric-row-header">
+                        <div>Metric Name</div>
+                        <div id="metricCompany1Header">Company 1</div>
+                        <div id="metricCompany2Header">Company 2</div>
+                        <div id="metricCompany3Header">Company 3</div>
+                        <div>Action</div>
+                    </div>
+                    <div id="metricsList">
+                        </div>
+                    <button type="button" id="addMetric" class="add-item-btn">
+                        <i class="fas fa-plus"></i> Add Metric Row
+                    </button>
                 </div>
 
-                <div class="form-group">
-                    <label for="evaluationFramework">Evaluation Framework</label>
-                    <input type="text" id="evaluationFramework" placeholder="e.g., Framework A + Framework B" value="Nielsen's 10 Heuristics + BRAG's Friction Map">
-                </div>
-            </div>
-
-            <div class="actions-container">
-                <button class="btn" onclick="goToTab('platforms')">Next: Platforms <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-
-        <div class="tab-content" id="platforms-tab">
-            <h2 class="section-title">Platforms</h2>
-            <p class="mb-4">Add the platforms you want to compare in your UX battle report.</p>
-
-            <div id="brokers-container">
-                </div>
-
-            <button class="btn btn-outline mb-4" onclick="addBroker()"><i class="fas fa-plus"></i> Add Platform</button>
-
-            <div class="actions-container">
-                <button class="btn btn-secondary" onclick="goToTab('content')"><i class="fas fa-arrow-left"></i> Previous</button>
-                <button class="btn" onclick="goToTab('metrics')">Next: Metrics <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-
-        <div class="tab-content" id="metrics-tab">
-             <h2 class="section-title">Quantitative Metrics</h2>
-            <p class="mb-4">Add metrics to compare platforms quantitatively. Values should correspond to the platforms added in the previous step, in the same order.</p>
-
-            <div id="metrics-container">
+                <div class="form-section">
+                    <h2 class="section-title">Heuristic Breakdown</h2>
+                     <p>Describe how each company performs against key usability heuristics.</p>
+                     <div class="metric-row metric-row-header">
+                        <div>Heuristic Name</div>
+                        <div id="heuristicCompany1Header">Company 1</div>
+                        <div id="heuristicCompany2Header">Company 2</div>
+                        <div id="heuristicCompany3Header">Company 3</div>
+                         <div>Action</div>
+                     </div>
+                    <div id="heuristicsList">
+                        </div>
+                    <button type="button" id="addHeuristic" class="add-item-btn">
+                        <i class="fas fa-plus"></i> Add Heuristic Row
+                    </button>
                 </div>
 
-            <button class="btn btn-outline mb-4" onclick="addMetric()"><i class="fas fa-plus"></i> Add Metric</button>
-
-            <div class="actions-container">
-                <button class="btn btn-secondary" onclick="goToTab('platforms')"><i class="fas fa-arrow-left"></i> Previous</button>
-                <button class="btn" onclick="goToTab('heuristics')">Next: Heuristics <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-
-        <div class="tab-content" id="heuristics-tab">
-             <h2 class="section-title">Heuristic Breakdown</h2>
-            <p class="mb-4">Add heuristics to evaluate platforms qualitatively. Evaluations should correspond to the platforms added, in the same order.</p>
-
-            <div id="heuristics-container">
+                <div class="form-section">
+                    <h2 class="section-title">Image Comparison (Optional)</h2>
+                    <p>Add sets of images (e.g., screenshots) for side-by-side comparison. Provide a caption for each set.</p>
+                    <div id="imageComparisonList">
+                        </div>
+                    <button type="button" id="addImageComparisonSet" class="add-item-btn">
+                        <i class="fas fa-plus"></i> Add Image Comparison Set
+                    </button>
                 </div>
 
-            <button class="btn btn-outline mb-4" onclick="addHeuristic()"><i class="fas fa-plus"></i> Add Heuristic</button>
+                <div class="form-section">
+                    <h2 class="section-title">UX Takeaways</h2>
+                     <p>Summarize the key strengths, weaknesses, and a representative user quote for each company.</p>
+                    <div id="takeawaysSection">
+                        </div>
+                </div>
 
-            <div class="actions-container">
-                <button class="btn btn-secondary" onclick="goToTab('metrics')"><i class="fas fa-arrow-left"></i> Previous</button>
-                <button class="btn" onclick="goToTab('preview')">Next: Preview <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
+                <div class="form-section">
+                    <h2 class="section-title">Industry Impact</h2>
+                    <div class="form-group">
+                        <label>Impact Points</label>
+                        <div id="impactPointsList" class="dynamic-list">
+                             <div class="item-row">
+                                <input type="text" name="impactPoints[]" value="India's user base is expanding beyond financially literate zones.">
+                                <button type="button" class="remove-item" aria-label="Remove Impact Point">&times;</button>
+                            </div>
+                            <div class="item-row">
+                                <input type="text" name="impactPoints[]" value="Apps need UX education + friction elimination simultaneously.">
+                                <button type="button" class="remove-item" aria-label="Remove Impact Point">&times;</button>
+                            </div>
+                            <div class="item-row">
+                                <input type="text" name="impactPoints[]" value="UX isn't just delight — it reduces drop-offs, increases retention, and builds trust.">
+                                <button type="button" class="remove-item" aria-label="Remove Impact Point">&times;</button>
+                            </div>
+                            <div class="item-row">
+                                <input type="text" name="impactPoints[]" value="Product teams can audit their own flows using BRAG's UX teardown template.">
+                                <button type="button" class="remove-item" aria-label="Remove Impact Point">&times;</button>
+                            </div>
+                        </div>
+                        <button type="button" id="addImpactPoint" class="add-item-btn">
+                            <i class="fas fa-plus"></i> Add Impact Point
+                        </button>
+                    </div>
+                </div>
 
-        <div class="tab-content" id="preview-tab">
-            <h2 class="section-title">Preview & Download</h2>
-
-            <div class="preview-actions">
-                <button class="btn" onclick="generateReport()"><i class="fas fa-sync-alt"></i> Generate/Refresh Preview</button>
-                <button class="btn btn-outline" id="download-html-btn" onclick="downloadHTML()" disabled><i class="fas fa-file-code"></i> Download HTML</button>
-                <button class="btn btn-outline" id="download-pdf-btn" onclick="downloadPDF()" disabled><i class="fas fa-file-pdf"></i> Download PDF</button>
-            </div>
-             <div id="pdf-loading" style="display: none; margin-top: 1rem; color: var(--brag-red);">
-                 <i class="fas fa-spinner fa-spin"></i> Generating PDF, please wait...
-             </div>
-
-            <div class="preview-container" id="preview-content">
-                <p>Click "Generate/Refresh Preview" to see the report.</p>
-            </div>
-
-            <div class="actions-container">
-                <button class="btn btn-secondary" onclick="goToTab('heuristics')"><i class="fas fa-arrow-left"></i> Previous</button>
-            </div>
+                <div class="button-container">
+                    <button type="button" id="previewButton"><i class="fas fa-eye"></i> Preview Report</button>
+                     <button type="button" id="downloadPdfButton"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <script>
-        // --- Global Data Storage (Read from DOM before generation) ---
-        // We don't need global JS arrays to store the state anymore.
-        // We will read directly from the DOM when generating the report.
+    <div class="preview-container" id="previewContainer">
+         <button class="close-preview" id="closePreviewButton" aria-label="Close Preview">&times;</button>
+        <div class="preview-content" id="previewContentArea">
+            </div>
+    </div>
 
-        // --- DOM Elements ---
-        const previewContent = document.getElementById('preview-content');
-        const downloadHtmlBtn = document.getElementById('download-html-btn');
-        const downloadPdfBtn = document.getElementById('download-pdf-btn');
-        const pdfLoadingIndicator = document.getElementById('pdf-loading');
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- DOM Element References ---
+        const reportForm = document.getElementById('reportForm');
+        const companiesList = document.getElementById('companiesList');
+        const addCompanyBtn = document.getElementById('addCompany');
+        const tasksList = document.getElementById('tasksList');
+        const addTaskBtn = document.getElementById('addTask');
+        const metricsList = document.getElementById('metricsList');
+        const addMetricBtn = document.getElementById('addMetric');
+        const heuristicsList = document.getElementById('heuristicsList');
+        const addHeuristicBtn = document.getElementById('addHeuristic');
+        const imageComparisonList = document.getElementById('imageComparisonList');
+        const addImageComparisonSetBtn = document.getElementById('addImageComparisonSet');
+        const takeawaysSection = document.getElementById('takeawaysSection');
+        const impactPointsList = document.getElementById('impactPointsList');
+        const addImpactPointBtn = document.getElementById('addImpactPoint');
+        const previewButton = document.getElementById('previewButton');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewContentArea = document.getElementById('previewContentArea');
+        const closePreviewButton = document.getElementById('closePreviewButton');
+        const downloadPdfButton = document.getElementById('downloadPdfButton');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
 
-        // --- Initialization ---
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add default brokers
-            addBroker('Zerodha', 'India\'s largest discount broker',
-                     'Fastest task completion\nCleanest visual hierarchy\nFew distractions', // Use newline for textarea
-                     'Poor for new users — Lack of visual onboarding\nHidden features need 3+ taps',
-                     'I know what I\'m doing here — but I wouldn\'t give this to my dad to figure out.');
+        // --- State Variables ---
+        let companyCount = 0;
+        let chartInstance = null; // For the preview chart
+        let isGeneratingPdf = false;
+        let imageComparisonSetCounter = 0;
 
-            addBroker('Dhan', 'UX-first newer entrant',
-                     'Clear discoverability\nPersistent help cues',
-                     'Too many action buttons\nAlert center UX secondary',
-                     'Nice design but feels a bit cramped. I like the help bubbles though.');
+        // --- Initial Data ---
+        const initialCompanies = [
+            "Zerodha (India's largest discount broker)",
+            "Dhan (UX-first newer entrant)",
+            "Upstox (VC-backed with mass reach)"
+        ];
+        const initialMetrics = [
+            { name: "Avg. Task Completion Time (sec)", v1: "47", v2: "53", v3: "66" },
+            { name: "Error Rate (%)", v1: "7.1", v2: "9.5", v3: "15.4" },
+            { name: "Time to First Action (sec)", v1: "4.2", v2: "3.8", v3: "5.9" },
+            { name: "Task Confidence (/10)", v1: "8.1", v2: "7.6", v3: "6.2" },
+        ];
+         const initialHeuristics = [
+            { name: "Recognition vs Recall", v1: "Strong – Icons are familiar", v2: "Strong – Good onboarding tooltips", v3: "Weak – Too many similar icons" },
+            { name: "Aesthetic & Minimal Design", v1: "Very Minimal", v2: "Clean but dense", v3: "Cluttered, ad-heavy" },
+            { name: "Visibility of System Status", v1: "Excellent", v2: "Good", v3: "Fair (delayed feedback)" },
+            { name: "User Control & Freedom", v1: "Weak – limited undo", v2: "Strong – Clear exit points", v3: "Fair – Back actions unclear" },
+            { name: "Consistency & Standards", v1: "Strong", v2: "Moderate", v3: "Moderate" }
+        ];
+         const initialTakeaways = [
+            { name: "Zerodha", strengths: ["Fastest task completion", "Cleanest visual hierarchy", "Few distractions"], weaknesses: ["Poor for new users — Lack of visual onboarding", "Hidden features need 3+ taps"], quote: "I know what I'm doing here — but I wouldn't give this to my dad to figure out." },
+            { name: "Dhan", strengths: ["Clear discoverability", "Persistent help cues"], weaknesses: ["Too many action buttons", "Alert center UX secondary"], quote: "Nice design but feels a bit cramped. I like the help bubbles though." },
+            { name: "Upstox", strengths: ["Friendly branding", "Great personalization potential"], weaknesses: ["Highest error rate", "Banner-heavy UI"], quote: "Why are there banners inside my trade screen? It's distracting." }
+        ];
 
-            addBroker('Upstox', 'VC-backed with mass reach',
-                     'Friendly branding\nGreat personalization potential',
-                     'Highest error rate\nBanner-heavy UI',
-                     'Why are there banners inside my trade screen? It\'s distracting.');
+        // --- Helper Functions ---
 
-            // Add default metrics (values correspond to brokers above)
-            addMetric('Avg. Task Completion Time', 'sec', ['47', '53', '66']);
-            addMetric('Error Rate', '%', ['7.1', '9.5', '15.4']);
-            addMetric('Time to First Action', 'sec', ['4.2', '3.8', '5.9']);
-            addMetric('Task Confidence', '/10', ['8.1', '7.6', '6.2']);
-            addMetric('Feature Discoverability', '', ['Medium', 'High', 'Low']);
+        /** Creates a standard input row with remove button. */
+        function createItemRow(listElement, inputName, placeholder = '', defaultValue = '', includeRemove = true, ariaLabelBase = 'Item', inputType = 'text') {
+            const div = document.createElement('div');
+            div.className = 'item-row';
+            const input = document.createElement('input');
+            input.type = inputType; input.name = inputName;
+            input.placeholder = placeholder; input.value = defaultValue;
+            div.appendChild(input);
 
-            // Add default heuristics (evaluations correspond to brokers above)
-            addHeuristic('Recognition vs Recall', ['Strong – Icons are familiar', 'Strong – Good onboarding tooltips', 'Weak – Too many similar icons']);
-            addHeuristic('Aesthetic & Minimal Design', ['Very Minimal', 'Clean but dense', 'Cluttered, ad-heavy']);
-            addHeuristic('Visibility of System Status', ['Excellent', 'Good', 'Fair (delayed feedback)']);
-            addHeuristic('User Control & Freedom', ['Weak – limited undo', 'Strong – Clear exit points', 'Fair – Back actions unclear']);
-            addHeuristic('Consistency & Standards', ['Strong', 'Moderate', 'Moderate']);
-
-            // Activate the first tab
-            goToTab('content'); // Ensure the first tab is active on load
-        });
-
-        // --- Tab Navigation ---
-        function goToTab(tabId) {
-            // Remove active class from all tabs and content
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            // Add active class to the clicked tab and corresponding content
-            const activeTab = document.querySelector(`.tab[data-tab="${tabId}"]`);
-            const activeContent = document.getElementById(`${tabId}-tab`);
-
-            if (activeTab) activeTab.classList.add('active');
-            if (activeContent) activeContent.classList.add('active');
-
-            // Special handling for metrics/heuristics tabs: refresh inputs if brokers changed
-             if (tabId === 'metrics') refreshMetricInputs();
-             if (tabId === 'heuristics') refreshHeuristicInputs();
+            if (includeRemove) {
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button'; removeBtn.className = 'remove-item';
+                removeBtn.innerHTML = '&times;'; removeBtn.setAttribute('aria-label', `Remove ${ariaLabelBase}`);
+                removeBtn.addEventListener('click', () => {
+                     div.remove();
+                     if (listElement === companiesList) updateCompanyDependentSections(); // Trigger update if a company is removed
+                 });
+                div.appendChild(removeBtn);
+            }
+            listElement.appendChild(div);
+            return div;
         }
 
-        // Add event listeners to tabs
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                goToTab(tab.getAttribute('data-tab'));
-            });
-        });
-
-        // --- Dynamic Item Management ---
-
-        // Helper to get current broker data from the DOM
-        function getCurrentBrokersFromDOM() {
-            const brokers = [];
-            document.querySelectorAll('#brokers-container .broker-item').forEach((item, index) => {
-                brokers.push({
-                    id: item.dataset.id || `broker_${index}`, // Assign temporary ID if needed
-                    name: item.querySelector('.broker-name')?.value || 'Unnamed Platform',
-                    description: item.querySelector('.broker-description')?.value || '',
-                    strengths: item.querySelector('.broker-strengths')?.value || '',
-                    weaknesses: item.querySelector('.broker-weaknesses')?.value || '',
-                    quote: item.querySelector('.broker-quote')?.value || ''
-                });
-            });
-            return brokers;
+        /** Creates a row for metrics/heuristics. */
+        function createMultiCompanyRow(listElement, namePlaceholder, valuePlaceholderBase, nameValue = '', values = [], nameInputName, valueInputNames, ariaLabelBase = 'Row') {
+            const div = document.createElement('div');
+            div.className = 'metric-row';
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text'; nameInput.name = nameInputName;
+            nameInput.placeholder = namePlaceholder; nameInput.value = nameValue;
+            div.appendChild(nameInput);
+            const companyNames = getCompanyNames();
+            for (let i = 0; i < valueInputNames.length; i++) {
+                const valueInput = document.createElement('input');
+                valueInput.type = 'text'; valueInput.name = valueInputNames[i];
+                valueInput.placeholder = `${valuePlaceholderBase} ${i + 1}`;
+                valueInput.value = values[i] || '';
+                // Get current company name for the label, fallback if needed
+                valueInput.setAttribute('data-company-label', companyNames[i] || `Company ${i + 1}`);
+                div.appendChild(valueInput);
+                // Hide input if no corresponding company exists yet
+                if (i >= companyNames.length) {
+                    valueInput.style.display = 'none';
+                }
+            }
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button'; removeBtn.className = 'remove-item';
+            removeBtn.innerHTML = '&times;'; removeBtn.setAttribute('aria-label', `Remove ${ariaLabelBase}`);
+            removeBtn.addEventListener('click', () => div.remove());
+            div.appendChild(removeBtn);
+            listElement.appendChild(div);
         }
 
+        /** Creates the UI section for a single company's UX Takeaways. */
+        function createTakeawaySection(index, name = '', strengths = [], weaknesses = [], quote = '') {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'takeaway-company-section';
+            sectionDiv.dataset.companyIndex = index;
+            const companyIdPrefix = `company${index + 1}`; // Use index+1 for 1-based IDs/names
+            const nameInputId = `${companyIdPrefix}Name`;
+            const strengthsListId = `${companyIdPrefix}StrengthsList`;
+            const weaknessesListId = `${companyIdPrefix}WeaknessesList`;
+            const quoteInputId = `${companyIdPrefix}Quote`;
+            const addStrengthBtnClass = `add-strength-btn-${index + 1}`;
+            const addWeaknessBtnClass = `add-weakness-btn-${index + 1}`;
 
-        // Add Broker/Platform
-        function addBroker(name = '', description = '', strengths = '', weaknesses = '', quote = '') {
-            const brokerId = `broker_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`; // More unique ID
-            const brokerItem = document.createElement('div');
-            brokerItem.className = 'broker-item';
-            brokerItem.dataset.id = brokerId; // Use data attribute for ID
-
-            brokerItem.innerHTML = `
-                <button type="button" class="remove-btn" onclick="removeBroker('${brokerId}')" title="Remove Platform">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="form-group">
-                    <label for="broker-name-${brokerId}">Platform Name</label>
-                    <input type="text" id="broker-name-${brokerId}" class="broker-name" value="${escapeHtml(name)}" placeholder="e.g., Platform A">
+            // Populate the section
+            sectionDiv.innerHTML = `
+                <h3>${name || `Company ${index + 1} Details`}</h3>
+                <div class="takeaway-details-grid">
+                    <div class="takeaway-group">
+                        <label>Strengths</label>
+                        <div id="${strengthsListId}" class="dynamic-list"></div>
+                        <button type="button" class="add-item-btn ${addStrengthBtnClass}" data-list-id="${strengthsListId}">
+                            <i class="fas fa-plus"></i> Add Strength
+                        </button>
+                    </div>
+                    <div class="takeaway-group">
+                        <label>Weaknesses</label>
+                        <div id="${weaknessesListId}" class="dynamic-list"></div>
+                        <button type="button" class="add-item-btn ${addWeaknessBtnClass}" data-list-id="${weaknessesListId}">
+                            <i class="fas fa-plus"></i> Add Weakness
+                        </button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="broker-desc-${brokerId}">Description</label>
-                    <input type="text" id="broker-desc-${brokerId}" class="broker-description" value="${escapeHtml(description)}" placeholder="e.g., Market leader with advanced features">
-                </div>
-                <div class="form-group">
-                    <label for="broker-strengths-${brokerId}">Strengths (one per line)</label>
-                    <textarea id="broker-strengths-${brokerId}" class="broker-strengths" placeholder="List the platform's strengths">${escapeHtml(strengths)}</textarea>
-                </div>
-                <div class="form-group">
-                    <label for="broker-weaknesses-${brokerId}">Weaknesses (one per line)</label>
-                    <textarea id="broker-weaknesses-${brokerId}" class="broker-weaknesses" placeholder="List the platform's weaknesses">${escapeHtml(weaknesses)}</textarea>
-                </div>
-                <div class="form-group">
-                    <label for="broker-quote-${brokerId}">User Quote</label>
-                    <textarea id="broker-quote-${brokerId}" class="broker-quote" placeholder="A representative user quote">${escapeHtml(quote)}</textarea>
+                <div class="takeaway-group takeaway-quote-group">
+                    <label for="${quoteInputId}">Representative Quote</label>
+                    <input type="text" id="${quoteInputId}" name="companyQuotes[]" value="${quote}" placeholder="Enter a user quote...">
                 </div>
             `;
 
-            document.getElementById('brokers-container').appendChild(brokerItem);
-            // No need to update a global array here
-        }
+            // Add existing strengths/weaknesses
+            const strengthsListElement = sectionDiv.querySelector(`#${strengthsListId}`);
+            strengths.forEach(strengthText => createItemRow(strengthsListElement, `${companyIdPrefix}Strengths[]`, 'Enter strength...', strengthText, true, 'Strength'));
+            const weaknessesListElement = sectionDiv.querySelector(`#${weaknessesListId}`);
+            weaknesses.forEach(weaknessText => createItemRow(weaknessesListElement, `${companyIdPrefix}Weaknesses[]`, 'Enter weakness...', weaknessText, true, 'Weakness'));
 
-        function removeBroker(brokerId) {
-            const itemToRemove = document.querySelector(`.broker-item[data-id="${brokerId}"]`);
-            if (itemToRemove) {
-                itemToRemove.remove();
-            }
-            // No need to update a global array here
-        }
-
-        // Add Metric
-        function addMetric(name = '', unit = '', values = []) {
-             const metricId = `metric_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-             const metricItem = document.createElement('div');
-             metricItem.className = 'metric-item';
-             metricItem.dataset.id = metricId;
-
-             const currentBrokers = getCurrentBrokersFromDOM(); // Get brokers currently in the DOM
-
-             let platformInputsHTML = '<div class="metric-values-container">'; // Container for values
-             currentBrokers.forEach((broker, index) => {
-                 const value = values[index] || ''; // Get corresponding value or default to empty
-                 platformInputsHTML += `
-                     <div class="form-group">
-                         <label for="metric-${metricId}-broker-${broker.id}">${escapeHtml(broker.name)} (${escapeHtml(name)})</label>
-                         <input type="text" id="metric-${metricId}-broker-${broker.id}" class="metric-value" data-broker-id="${broker.id}" value="${escapeHtml(value)}" placeholder="Value for ${escapeHtml(broker.name)}">
-                     </div>
-                 `;
-             });
-             platformInputsHTML += '</div>';
-
-             metricItem.innerHTML = `
-                 <button type="button" class="remove-btn" onclick="removeMetric('${metricId}')" title="Remove Metric">
-                     <i class="fas fa-times"></i>
-                 </button>
-                 <div class="form-group">
-                     <label for="metric-name-${metricId}">Metric Name</label>
-                     <input type="text" id="metric-name-${metricId}" class="metric-name" value="${escapeHtml(name)}" placeholder="e.g., Success Rate">
-                 </div>
-                 <div class="form-group">
-                     <label for="metric-unit-${metricId}">Unit (optional)</label>
-                     <input type="text" id="metric-unit-${metricId}" class="metric-unit" value="${escapeHtml(unit)}" placeholder="e.g., %, sec, etc.">
-                 </div>
-                 ${platformInputsHTML}
-             `;
-
-             document.getElementById('metrics-container').appendChild(metricItem);
-         }
-
-        function removeMetric(metricId) {
-            const itemToRemove = document.querySelector(`.metric-item[data-id="${metricId}"]`);
-            if (itemToRemove) {
-                itemToRemove.remove();
-            }
-        }
-
-        // Add Heuristic
-        function addHeuristic(name = '', evaluations = []) {
-             const heuristicId = `heuristic_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-             const heuristicItem = document.createElement('div');
-             heuristicItem.className = 'heuristic-item';
-             heuristicItem.dataset.id = heuristicId;
-
-             const currentBrokers = getCurrentBrokersFromDOM(); // Get brokers currently in the DOM
-
-             let platformInputsHTML = '<div class="heuristic-evaluations-container">'; // Container
-             currentBrokers.forEach((broker, index) => {
-                 const evaluation = evaluations[index] || ''; // Get corresponding evaluation or default
-                 platformInputsHTML += `
-                     <div class="form-group">
-                         <label for="heuristic-${heuristicId}-broker-${broker.id}">${escapeHtml(broker.name)} Evaluation</label>
-                         <input type="text" id="heuristic-${heuristicId}-broker-${broker.id}" class="heuristic-evaluation" data-broker-id="${broker.id}" value="${escapeHtml(evaluation)}" placeholder="Evaluation for ${escapeHtml(broker.name)}">
-                     </div>
-                 `;
-             });
-              platformInputsHTML += '</div>';
-
-             heuristicItem.innerHTML = `
-                 <button type="button" class="remove-btn" onclick="removeHeuristic('${heuristicId}')" title="Remove Heuristic">
-                     <i class="fas fa-times"></i>
-                 </button>
-                 <div class="form-group">
-                     <label for="heuristic-name-${heuristicId}">Heuristic Name</label>
-                     <input type="text" id="heuristic-name-${heuristicId}" class="heuristic-name" value="${escapeHtml(name)}" placeholder="e.g., Error Prevention">
-                 </div>
-                 ${platformInputsHTML}
-             `;
-
-             document.getElementById('heuristics-container').appendChild(heuristicItem);
-         }
-
-        function removeHeuristic(heuristicId) {
-            const itemToRemove = document.querySelector(`.heuristic-item[data-id="${heuristicId}"]`);
-            if (itemToRemove) {
-                itemToRemove.remove();
-            }
-        }
-
-        // Functions to refresh metric/heuristic inputs if brokers change
-        function refreshMetricInputs() {
-            const currentBrokers = getCurrentBrokersFromDOM();
-            document.querySelectorAll('.metric-item').forEach(metricItem => {
-                const metricId = metricItem.dataset.id;
-                const metricName = metricItem.querySelector('.metric-name')?.value || '';
-                const valuesContainer = metricItem.querySelector('.metric-values-container');
-                if (!valuesContainer) return;
-
-                // Store existing values
-                const existingValues = {};
-                metricItem.querySelectorAll('.metric-value').forEach(input => {
-                    existingValues[input.dataset.brokerId] = input.value;
-                });
-
-                // Rebuild inputs
-                let newInputsHTML = '';
-                currentBrokers.forEach(broker => {
-                    const value = existingValues[broker.id] || ''; // Keep existing value if broker still exists
-                     newInputsHTML += `
-                        <div class="form-group">
-                            <label for="metric-${metricId}-broker-${broker.id}">${escapeHtml(broker.name)} (${escapeHtml(metricName)})</label>
-                            <input type="text" id="metric-${metricId}-broker-${broker.id}" class="metric-value" data-broker-id="${broker.id}" value="${escapeHtml(value)}" placeholder="Value for ${escapeHtml(broker.name)}">
-                        </div>
-                    `;
-                });
-                valuesContainer.innerHTML = newInputsHTML;
+            // Add event listeners for the 'add' buttons
+            sectionDiv.querySelector(`.${addStrengthBtnClass}`).addEventListener('click', function() {
+                createItemRow(document.getElementById(this.dataset.listId), `${companyIdPrefix}Strengths[]`, 'Enter strength...', '', true, 'Strength');
             });
+            sectionDiv.querySelector(`.${addWeaknessBtnClass}`).addEventListener('click', function() {
+                createItemRow(document.getElementById(this.dataset.listId), `${companyIdPrefix}Weaknesses[]`, 'Enter weakness...', '', true, 'Weakness');
+            });
+
+            takeawaysSection.appendChild(sectionDiv);
+            updateTakeawaySectionTitle(index); // Update title based on main company list
         }
 
-        function refreshHeuristicInputs() {
-             const currentBrokers = getCurrentBrokersFromDOM();
-             document.querySelectorAll('.heuristic-item').forEach(heuristicItem => {
-                 const heuristicId = heuristicItem.dataset.id;
-                 const evaluationsContainer = heuristicItem.querySelector('.heuristic-evaluations-container');
-                 if (!evaluationsContainer) return;
+        /** Creates UI for adding a set of comparison images. */
+        function createImageComparisonSetRow(setId) {
+            const setDiv = document.createElement('div');
+            setDiv.className = 'image-comparison-set'; setDiv.id = `image-set-${setId}`;
+            const companyNames = getCompanyNames();
+            let imageInputsHTML = '';
+            // Create inputs for existing companies
+            for(let i = 0; i < companyNames.length; i++) {
+                imageInputsHTML += `
+                    <div class="form-group">
+                        <label for="imageSet${setId}Comp${i+1}Url">Image URL (${companyNames[i] || 'Company '+(i+1)})</label>
+                        <input type="url" id="imageSet${setId}Comp${i+1}Url" name="imageComp${i+1}Urls[]" placeholder="https://...">
+                    </div>`;
+            }
+            // Create hidden inputs for potential companies up to 3
+             for (let i = companyNames.length; i < 3; i++) {
+                  imageInputsHTML += `
+                      <div class="form-group" style="display: none;">
+                          <label for="imageSet${setId}Comp${i+1}Url">Image URL (Company ${i+1})</label>
+                          <input type="url" id="imageSet${setId}Comp${i+1}Url" name="imageComp${i+1}Urls[]" placeholder="https://...">
+                      </div>`;
+             }
+            setDiv.innerHTML = `
+                <button type="button" class="remove-item remove-set-btn" aria-label="Remove Image Set">&times;</button>
+                <div class="form-group">
+                    <label for="imageSet${setId}Caption">Image Set Caption</label>
+                    <input type="text" id="imageSet${setId}Caption" name="imageCaptions[]" placeholder="e.g., Homepage Comparison">
+                </div>
+                <div class="image-inputs-grid">
+                    ${imageInputsHTML}
+                </div>
+            `;
+            setDiv.querySelector('.remove-set-btn').addEventListener('click', () => setDiv.remove());
+            imageComparisonList.appendChild(setDiv);
+        }
 
-                 // Store existing evaluations
-                 const existingEvals = {};
-                 heuristicItem.querySelectorAll('.heuristic-evaluation').forEach(input => {
-                     existingEvals[input.dataset.brokerId] = input.value;
-                 });
+        /** Gets the current company names FROM THE companiesList */
+        function getCompanyNames() {
+            const nameInputs = companiesList.querySelectorAll('input[name="companies[]"]');
+            return Array.from(nameInputs).map((input, i) => input.value.trim() || `Company ${i + 1}`);
+        }
 
-                 // Rebuild inputs
-                 let newInputsHTML = '';
-                 currentBrokers.forEach(broker => {
-                     const evaluation = existingEvals[broker.id] || ''; // Keep existing value
-                     newInputsHTML += `
-                         <div class="form-group">
-                             <label for="heuristic-${heuristicId}-broker-${broker.id}">${escapeHtml(broker.name)} Evaluation</label>
-                             <input type="text" id="heuristic-${heuristicId}-broker-${broker.id}" class="heuristic-evaluation" data-broker-id="${broker.id}" value="${escapeHtml(evaluation)}" placeholder="Evaluation for ${escapeHtml(broker.name)}">
-                         </div>
-                     `;
-                 });
-                 evaluationsContainer.innerHTML = newInputsHTML;
+        /** Updates the title of a specific takeaway section based on the main company list */
+        function updateTakeawaySectionTitle(index) {
+            const companyNames = getCompanyNames();
+            const sectionDiv = takeawaysSection.querySelector(`.takeaway-company-section[data-company-index="${index}"]`);
+            if (sectionDiv) {
+                const titleElement = sectionDiv.querySelector('h3');
+                if (titleElement) {
+                    titleElement.textContent = companyNames[index] ? `${companyNames[index]} Details` : `Company ${index + 1} Details`;
+                }
+            }
+        }
+
+        /** Updates metric/heuristic headers and visibility of value inputs. */
+        function updateCompanyHeaders() {
+             const companyNames = getCompanyNames();
+             const maxCompanies = 3; // Keep track of max possible
+
+             // Update Metric/Heuristic Table Headers
+             const headersToUpdate = [
+                 document.querySelectorAll('.metric-row-header:has(#metricCompany1Header) div:not(:first-child):not(:last-child)'),
+                 document.querySelectorAll('.metric-row-header:has(#heuristicCompany1Header) div:not(:first-child):not(:last-child)')
+             ];
+
+             headersToUpdate.forEach(headerSet => {
+                // Target specific headers by potential index (1, 2, 3)
+                const headerDivs = Array.from(headerSet);
+                for(let i = 0; i < maxCompanies; i++) {
+                    if(headerDivs[i]) { // Check if header div exists
+                        if (i < companyNames.length) {
+                            headerDivs[i].textContent = companyNames[i] || `Company ${i + 1}`;
+                            headerDivs[i].style.display = '';
+                        } else {
+                            headerDivs[i].style.display = 'none'; // Hide unused header columns
+                        }
+                    }
+                }
+             });
+
+             // Update Metric/Heuristic Row Value Inputs (Visibility and Labels)
+             const rowsToUpdate = [
+                 ...metricsList.querySelectorAll('.metric-row:not(.metric-row-header)'),
+                 ...heuristicsList.querySelectorAll('.metric-row:not(.metric-row-header)')
+             ];
+
+             rowsToUpdate.forEach(row => {
+                for(let i = 0; i < maxCompanies; i++) {
+                    // Find input based on index (metricNValues, heuristicNValues)
+                    const valueInput = row.querySelector(`input[name="metric${i+1}Values[]"], input[name="heuristic${i+1}Values[]"]`);
+                    if (valueInput) { // Check if input exists
+                        if (i < companyNames.length) {
+                            valueInput.style.display = '';
+                            valueInput.setAttribute('data-company-label', companyNames[i] || `Company ${i + 1}`);
+                        } else {
+                            valueInput.style.display = 'none'; // Hide unused value inputs
+                        }
+                    }
+                }
+             });
+
+             // Update Image Comparison Input Labels and Visibility
+             document.querySelectorAll('.image-comparison-set').forEach(setDiv => {
+                 const grid = setDiv.querySelector('.image-inputs-grid');
+                 for(let i = 0; i < maxCompanies; i++) {
+                    const group = grid.querySelector(`#imageSet${setDiv.id.split('-').pop()}Comp${i+1}Url`)?.closest('.form-group');
+                    if (group) { // Check if group exists
+                        const label = group.querySelector('label');
+                        if (i < companyNames.length) {
+                             group.style.display = '';
+                             if (label) label.textContent = `Image URL (${companyNames[i] || `Company ${i + 1}`})`;
+                        } else {
+                            group.style.display = 'none'; // Hide extra image URL inputs
+                        }
+                    }
+                 }
              });
          }
 
+        /** Updates takeaways and image comparison sections when companies change in companiesList. */
+        function updateCompanyDependentSections() {
+            const currentCompanyInputs = companiesList.querySelectorAll('.item-row input');
+            const newCompanyCount = currentCompanyInputs.length;
+            const existingTakeawaySections = takeawaysSection.querySelectorAll('.takeaway-company-section');
+            const currentTakeawayCount = existingTakeawaySections.length;
 
-        // --- Report Generation and Download ---
+            // Sync Takeaway Sections
+            if (newCompanyCount < currentTakeawayCount) {
+                // Remove extra takeaway sections
+                for (let i = currentTakeawayCount - 1; i >= newCompanyCount; i--) {
+                    existingTakeawaySections[i].remove();
+                }
+            } else if (newCompanyCount > currentTakeawayCount) {
+                // Add new takeaway sections
+                for (let i = currentTakeawayCount; i < newCompanyCount; i++) {
+                    // Create with default values, name will be updated by updateTakeawaySectionTitle
+                    createTakeawaySection(i, '', [], [], '');
+                }
+            }
 
-        // Helper function to get all form data
-        function getReportData() {
-            const data = {};
+            // Update titles for all existing/new takeaway sections
+            for (let i = 0; i < newCompanyCount; i++) {
+                updateTakeawaySectionTitle(i);
+            }
 
-            // Basic Info
-            data.reportTitle = document.getElementById('reportTitle')?.value || 'UX Battle Report';
-            data.reportSubtitle = document.getElementById('reportSubtitle')?.value || '';
-            data.introText = document.getElementById('introText')?.value || ''; // Keep potential HTML like <br>
+            // Update other dependent parts like headers, inputs visibility
+            updateCompanyHeaders();
+            companyCount = newCompanyCount; // Update global count
+        }
 
-            // Methodology
-            data.methodology = {
-                sampleSize: document.getElementById('sampleSize')?.value || 'N/A',
-                ageGroup: document.getElementById('ageGroup')?.value || 'N/A',
-                toolsUsed: document.getElementById('toolsUsed')?.value || 'N/A',
-                testTasks: (document.getElementById('testTasks')?.value || '').split(',').map(t => t.trim()).filter(t => t),
-                evaluationFramework: document.getElementById('evaluationFramework')?.value || 'N/A'
-            };
+        // --- Event Listeners ---
+        addCompanyBtn.addEventListener('click', () => {
+             if (companyCount < 3) {
+                 createItemRow(companiesList, 'companies[]', 'Company Name...', '', true, 'Company', 'text');
+                 updateCompanyDependentSections(); // This will add takeaway section and update headers
+             } else {
+                 alert("Currently limited to 3 companies for comparison.");
+             }
+         });
 
-            // Platforms (Brokers)
-            data.brokers = getCurrentBrokersFromDOM(); // Use helper to read from DOM
+        // Listener for changes in company names in the main list
+        companiesList.addEventListener('input', (event) => {
+             if (event.target && event.target.matches('input[name="companies[]"]')) {
+                 // Find the index of the changed input
+                 const allCompanyInputs = Array.from(companiesList.querySelectorAll('input[name="companies[]"]'));
+                 const index = allCompanyInputs.indexOf(event.target);
+                 if (index !== -1) {
+                     updateTakeawaySectionTitle(index); // Update corresponding takeaway title
+                     updateCompanyHeaders(); // Update table headers etc.
+                 }
+             }
+         });
 
-            // Metrics
-            data.metrics = [];
-            document.querySelectorAll('#metrics-container .metric-item').forEach(item => {
-                const metric = {
-                    id: item.dataset.id,
-                    name: item.querySelector('.metric-name')?.value || 'Unnamed Metric',
-                    unit: item.querySelector('.metric-unit')?.value || '',
-                    values: [] // { brokerId: '...', brokerName: '...', value: '...' }
-                };
-                item.querySelectorAll('.metric-value').forEach(input => {
-                    const brokerId = input.dataset.brokerId;
-                    // Find broker name using brokerId (important for report display)
-                    const broker = data.brokers.find(b => b.id === brokerId);
-                    metric.values.push({
-                        brokerId: brokerId,
-                        brokerName: broker ? broker.name : 'Unknown Platform', // Add name for convenience
-                        value: input.value || ''
+
+        addTaskBtn.addEventListener('click', () => createItemRow(tasksList, 'tasks[]', 'Enter test task...', '', true, 'Task', 'text'));
+        addMetricBtn.addEventListener('click', () => createMultiCompanyRow(metricsList, 'Metric Name', 'Value', '', [], 'metricNames[]', ['metric1Values[]', 'metric2Values[]', 'metric3Values[]'], 'Metric Row'));
+        addHeuristicBtn.addEventListener('click', () => createMultiCompanyRow(heuristicsList, 'Heuristic Name', 'Evaluation', '', [], 'heuristicNames[]', ['heuristic1Values[]', 'heuristic2Values[]', 'heuristic3Values[]'], 'Heuristic Row'));
+        addImageComparisonSetBtn.addEventListener('click', () => createImageComparisonSetRow(++imageComparisonSetCounter));
+        addImpactPointBtn.addEventListener('click', () => createItemRow(impactPointsList, 'impactPoints[]', 'Enter impact point...', '', true, 'Impact Point', 'text'));
+
+        // Centralized remove listener for dynamic lists
+        [companiesList, tasksList, metricsList, heuristicsList, impactPointsList, takeawaysSection, imageComparisonList].forEach(list => {
+             if(list) {
+                 list.addEventListener('click', function(event) {
+                     // Handle removing item rows (tasks, impacts, strengths, weaknesses)
+                     if (event.target.classList.contains('remove-item') && event.target.closest('.item-row')) {
+                         event.target.closest('.item-row').remove();
+                     }
+                     // Handle removing metric/heuristic rows
+                     else if (event.target.classList.contains('remove-item') && event.target.closest('.metric-row')) {
+                         event.target.closest('.metric-row').remove();
+                     }
+                     // Handle removing image comparison sets
+                     else if (event.target.classList.contains('remove-set-btn') && event.target.closest('.image-comparison-set')) {
+                         event.target.closest('.image-comparison-set').remove();
+                     }
+                 });
+             }
+         });
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.getAttribute('data-tab'))?.classList.add('active');
+            });
+        });
+
+        previewButton.addEventListener('click', generatePreview); // Keep using the same preview generation
+        closePreviewButton.addEventListener('click', () => {
+            previewContainer.style.display = 'none';
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+        });
+
+        // --- PDF Download Button Logic ---
+        downloadPdfButton.addEventListener('click', async () => {
+            if (isGeneratingPdf) return;
+            isGeneratingPdf = true;
+            downloadPdfButton.disabled = true;
+            downloadPdfButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            console.log("PDF generation started (Preview Based)...");
+
+            // Ensure the preview content is generated and visible (even if modal itself isn't shown)
+            generatePreview(); // Generate HTML and render chart in previewContentArea
+
+            // Wait a moment for the DOM and chart to render in the preview area
+            await new Promise(resolve => setTimeout(resolve, 500)); // Delay to ensure rendering, esp chart
+            console.log("Preview content generated/updated.");
+
+            // Wait for images within the preview area to load
+            const waitForImagesInPreview = (container) => {
+                const images = Array.from(container.querySelectorAll('img')); // All images in preview
+                const promises = images.map(img => {
+                    return new Promise((resolve) => {
+                        if (img.complete && img.naturalHeight !== 0) { // Already loaded
+                            console.log('PDF Image (Preview) already loaded:', img.src.substring(0, 100));
+                            resolve();
+                        } else {
+                            img.onload = () => { console.log('PDF Image (Preview) loaded:', img.src.substring(0, 100)); resolve(); };
+                            img.onerror = () => {
+                                console.warn('PDF Image (Preview) failed:', img.src.substring(0, 100));
+                                // The preview already has error handling, just resolve
+                                resolve();
+                            };
+                        }
                     });
                 });
-                 // Ensure values are in the same order as brokers for table generation
-                 metric.values.sort((a, b) => {
-                     const indexA = data.brokers.findIndex(broker => broker.id === a.brokerId);
-                     const indexB = data.brokers.findIndex(broker => broker.id === b.brokerId);
-                     return indexA - indexB;
-                 });
-                data.metrics.push(metric);
-            });
+                console.log(`Waiting for ${promises.length} preview images for PDF...`);
+                return Promise.allSettled(promises);
+            };
 
-            // Heuristics
-            data.heuristics = [];
-            document.querySelectorAll('#heuristics-container .heuristic-item').forEach(item => {
-                const heuristic = {
-                    id: item.dataset.id,
-                    name: item.querySelector('.heuristic-name')?.value || 'Unnamed Heuristic',
-                    evaluations: [] // { brokerId: '...', brokerName: '...', evaluation: '...' }
+            try {
+                await waitForImagesInPreview(previewContentArea);
+                console.log("Preview images settled.");
+
+                // Temporarily apply PDF styles
+                document.body.classList.add('pdf-styles');
+                // Optional: hide the preview modal visually during generation
+                document.body.classList.add('pdf-generation-active');
+
+                const reportTitleInput = document.getElementById('reportTitle');
+                const filename = (reportTitleInput?.value.trim() || 'BRAG-Report') + '.pdf';
+
+                const opt = {
+                    margin:       [0.5, 0.5, 0.5, 0.5], // inches [top, left, bottom, right]
+                    filename:     filename,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  {
+                        scale: 2, // Higher resolution
+                        logging: true, // Enable logs for debugging
+                        useCORS: true, // Important for external images/logos
+                        scrollX: 0, // Ensure we capture from the top-left
+                        scrollY: 0,
+                        windowWidth: previewContentArea.scrollWidth, // Try to match content width
+                        windowHeight: previewContentArea.scrollHeight // Try to match content height
+                    },
+                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+                    pagebreak:    { mode: ['avoid-all', 'css', 'legacy'], before: '.page-break' }
                 };
-                item.querySelectorAll('.heuristic-evaluation').forEach(input => {
-                     const brokerId = input.dataset.brokerId;
-                     const broker = data.brokers.find(b => b.id === brokerId);
-                     heuristic.evaluations.push({
-                         brokerId: brokerId,
-                         brokerName: broker ? broker.name : 'Unknown Platform',
-                         evaluation: input.value || ''
-                     });
-                });
-                 // Ensure evaluations are in the same order as brokers
-                 heuristic.evaluations.sort((a, b) => {
-                     const indexA = data.brokers.findIndex(broker => broker.id === a.brokerId);
-                     const indexB = data.brokers.findIndex(broker => broker.id === b.brokerId);
-                     return indexA - indexB;
-                 });
-                data.heuristics.push(heuristic);
+
+                console.log("Calling html2pdf on previewContentArea...");
+
+                // Generate the PDF from the preview content area
+                await html2pdf().from(previewContentArea).set(opt).save();
+
+                console.log("PDF generation successful.");
+
+            } catch (error) {
+                console.error("Error during PDF generation process:", error);
+                alert(`An error occurred generating the PDF. Please check the console for details. Error: ${error.message}`);
+            } finally {
+                console.log("Cleaning up PDF generation resources.");
+                // Remove temporary styles
+                document.body.classList.remove('pdf-styles');
+                document.body.classList.remove('pdf-generation-active');
+
+                // Reset button state
+                isGeneratingPdf = false;
+                downloadPdfButton.disabled = false;
+                downloadPdfButton.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF';
+
+                 // Optional: close the preview modal if it was opened by generatePreview
+                 // previewContainer.style.display = 'none';
+                 // if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+            }
+        });
+
+
+        // --- Preview Generation Logic ---
+
+        /** Extracts numerical value from a string. */
+        function extractNumericValue(valueString) {
+            if (typeof valueString !== 'string') return null;
+            // Allow for leading/trailing spaces, commas, common units (sec, %, /10), k/m multipliers
+            const cleanedString = valueString.trim().replace(/,/g, '');
+            let multiplier = 1;
+            if (cleanedString.toLowerCase().endsWith('k')) {
+                multiplier = 1000;
+            } else if (cleanedString.toLowerCase().endsWith('m')) {
+                multiplier = 1000000;
+            }
+            const numberString = cleanedString.replace(/(sec|%|\/10|k|m|\s)/gi, '').trim();
+
+            // Check if it's a valid number format (allows negative, decimal)
+            if (!/^-?\d*\.?\d+$/.test(numberString)) return null;
+
+            const number = parseFloat(numberString);
+            return isNaN(number) ? null : number * multiplier;
+        }
+
+        /** Prepares data for the Chart.js bar chart. */
+        function getChartData() {
+            const metricRows = metricsList.querySelectorAll('.metric-row:not(.metric-row-header)'); // Exclude header
+            const companyNames = getCompanyNames();
+            const labels = [];
+            const datasets = companyNames.map((name, i) => ({
+                label: name || `Company ${i+1}`,
+                data: [],
+                borderWidth: 1
+            }));
+
+            metricRows.forEach(row => {
+                const metricNameInput = row.querySelector('input[name="metricNames[]"]');
+                const metricName = metricNameInput ? metricNameInput.value.trim() : '';
+
+                // Get values ONLY for the currently defined companies
+                const currentValues = [];
+                let hasNumericDataForRow = false;
+                for(let i=0; i < companyNames.length; i++){
+                    const valueInput = row.querySelector(`input[name="metric${i+1}Values[]"]`);
+                    const numericVal = valueInput ? extractNumericValue(valueInput.value) : null;
+                    currentValues.push(numericVal); // Push null if no input or not numeric
+                    if(numericVal !== null) {
+                        hasNumericDataForRow = true;
+                    }
+                }
+
+                // Only add the metric if it has a name AND at least one company has a numeric value for it
+                if (metricName && hasNumericDataForRow) {
+                    labels.push(metricName);
+                    datasets.forEach((dataset, index) => {
+                        dataset.data.push(currentValues[index]); // Will push nulls correctly
+                    });
+                }
             });
 
-            return data;
+            // Define more distinct colors if needed
+            const backgroundColors = ['rgba(211, 47, 47, 0.7)', 'rgba(25, 118, 210, 0.7)', 'rgba(56, 142, 60, 0.7)']; // Red, Blue, Green
+            const borderColors = ['rgb(211, 47, 47)', 'rgb(25, 118, 210)', 'rgb(56, 142, 60)'];
+            datasets.forEach((ds, i) => {
+                ds.backgroundColor = backgroundColors[i % backgroundColors.length];
+                ds.borderColor = borderColors[i % borderColors.length];
+            });
+
+            return { labels, datasets };
         }
 
-        // Generate Report HTML
-        function generateReport() {
-            console.log("Generating report...");
-            const data = getReportData();
-            console.log("Data collected:", data);
-
-            // --- Build HTML String ---
-            // (HTML structure remains the same as before, only CSS was changed)
-            let reportHtml = `
-            <div class="report-container">
-                <div class="report-header">
-                    <div class="report-logo">BRAG</div>
-                    <h1 class="report-main-title">${escapeHtml(data.reportTitle)}</h1>
-                    <p class="report-subtitle">${escapeHtml(data.reportSubtitle)}</p>
-                </div>
-
-                <div class="report-section">
-                    <h2 class="report-title">Introduction</h2>
-                    <p>${data.introText.replace(/\n/g, '<br>')}</p>
-                </div>
-
-                <div class="report-section">
-                    <h2 class="report-title">Methodology</h2>
-                    <div class="report-methodology-container">
-                        <div class="report-methodology-item">
-                            <div class="report-methodology-icon"><i class="fas fa-users"></i></div>
-                            <div class="report-methodology-content"><h4>Sample Size</h4><p>${escapeHtml(data.methodology.sampleSize)}</p></div>
-                        </div>
-                        <div class="report-methodology-item">
-                            <div class="report-methodology-icon"><i class="fas fa-birthday-cake"></i></div>
-                            <div class="report-methodology-content"><h4>Age Group</h4><p>${escapeHtml(data.methodology.ageGroup)}</p></div>
-                        </div>
-                        <div class="report-methodology-item">
-                            <div class="report-methodology-icon"><i class="fas fa-tools"></i></div>
-                            <div class="report-methodology-content"><h4>Tools Used</h4><p>${escapeHtml(data.methodology.toolsUsed)}</p></div>
-                        </div>
-                         <div class="report-methodology-item">
-                            <div class="report-methodology-icon"><i class="fas fa-tasks"></i></div>
-                            <div class="report-methodology-content"><h4>Test Tasks</h4><p>${data.methodology.testTasks.length > 0 ? data.methodology.testTasks.map(escapeHtml).join(', ') : 'N/A'}</p></div>
-                        </div>
-                         <div class="report-methodology-item">
-                            <div class="report-methodology-icon"><i class="fas fa-clipboard-check"></i></div>
-                            <div class="report-methodology-content"><h4>Evaluation Framework</h4><p>${escapeHtml(data.methodology.evaluationFramework)}</p></div>
-                        </div>
-                    </div>
-                </div>`;
-
-            // Quantitative Metrics Table
-            if (data.metrics.length > 0 && data.brokers.length > 0) {
-                reportHtml += `
-                <div class="report-section">
-                    <h2 class="report-title">Quantitative Metrics</h2>
-                    <table class="report-table">
-                        <thead>
-                            <tr>
-                                <th>Metric</th>
-                                ${data.brokers.map(broker => `<th>${escapeHtml(broker.name)}</th>`).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.metrics.map(metric => `
-                                <tr>
-                                    <td>${escapeHtml(metric.name)} ${metric.unit ? `(${escapeHtml(metric.unit)})` : ''}</td>
-                                    ${metric.values.map(val => `<td>${escapeHtml(val.value)}</td>`).join('')}
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>`;
-            }
-
-             // Heuristic Breakdown Table
-            if (data.heuristics.length > 0 && data.brokers.length > 0) {
-                reportHtml += `
-                <div class="report-section">
-                    <h2 class="report-title">Heuristic Breakdown</h2>
-                    <table class="report-table">
-                        <thead>
-                            <tr>
-                                <th>Heuristic</th>
-                                ${data.brokers.map(broker => `<th>${escapeHtml(broker.name)}</th>`).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.heuristics.map(heuristic => `
-                                <tr>
-                                    <td>${escapeHtml(heuristic.name)}</td>
-                                    ${heuristic.evaluations.map(ev => `<td>${escapeHtml(ev.evaluation)}</td>`).join('')}
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>`;
-            }
-
-            // Platform Deep Dive (Strengths, Weaknesses, Quotes)
-            if (data.brokers.length > 0) {
-                reportHtml += `
-                <div class="report-section">
-                    <h2 class="report-title">Platform Deep Dive</h2>
-                    <div class="report-takeaways-grid">
-                    ${data.brokers.map(broker => `
-                        <div class="report-card report-broker-card">
-                             <div class="report-broker-name">${escapeHtml(broker.name)}</div>
-                             <p><em>${escapeHtml(broker.description)}</em></p>
-
-                            ${broker.strengths ? `
-                            <div class="broker-strengths">
-                                <span class="strengths-label">Strengths</span>
-                                <ul class="strengths-list">
-                                    ${broker.strengths.split('\n').map(s => s.trim()).filter(s => s).map(s => `<li>${escapeHtml(s)}</li>`).join('')}
-                                </ul>
-                            </div>` : ''}
-
-                             ${broker.weaknesses ? `
-                            <div class="broker-weaknesses">
-                                <span class="weaknesses-label">Weaknesses</span>
-                                <ul class="weaknesses-list">
-                                     ${broker.weaknesses.split('\n').map(w => w.trim()).filter(w => w).map(w => `<li>${escapeHtml(w)}</li>`).join('')}
-                                </ul>
-                            </div>` : ''}
-
-                            ${broker.quote ? `<div class="quote-text">${escapeHtml(broker.quote)}</div>` : ''}
-                        </div>
-                    `).join('')}
-                    </div>
-                </div>`;
-            }
-
-            // Footer
-            reportHtml += `
-                <div class="report-footer">
-                    Generated by BRAG UX Battle Report Generator &copy; ${new Date().getFullYear()}
-                </div>
-            </div>`; // Close report-container
-
-
-            // --- Update Preview ---
-            previewContent.innerHTML = reportHtml;
-
-            // Enable download buttons
-            downloadHtmlBtn.disabled = false;
-            downloadPdfBtn.disabled = false;
-
-            console.log("Report generated and preview updated.");
+        /** Defines options for the Chart.js chart. */
+        function getChartOptions() {
+            return {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#666', font: { size: 10 } }, // Smaller font for PDF
+                        grid: { color: '#eee' }
+                    },
+                    x: {
+                        ticks: { color: '#666', font: { size: 10 } }, // Smaller font for PDF
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#333', padding: 15, font: { size: 10 } } // Smaller font for PDF
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff', bodyColor: '#fff',
+                        padding: 10, boxPadding: 4
+                    }
+                },
+                responsive: true, // Keep responsive for preview
+                maintainAspectRatio: false, // Important for sizing within container
+                // Disable animation for faster rendering, especially for PDF capture
+                animation: false,
+                 // Ensure chart renders crisply, especially important if using scale in html2canvas
+                 devicePixelRatio: window.devicePixelRatio || 1
+            };
         }
 
-        // Download HTML
-        function downloadHTML() {
-            if (downloadHtmlBtn.disabled) return; // Don't run if disabled
 
-            const reportFullHtml = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${escapeHtml(document.getElementById('reportTitle')?.value || "Report")}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        /* Inject all the report styles defined in the main <style> block */
-        ${Array.from(document.styleSheets)
-            .map(sheet => {
-                try {
-                    // Check if rules are accessible (avoid CORS issues with external sheets if any)
-                    return Array.from(sheet.cssRules || [])
-                        .map(rule => rule.cssText || '')
-                        .join('\n');
-                } catch (e) {
-                    console.warn("Could not access rules from stylesheet:", sheet.href, e);
-                    return '';
-                }
-            })
-            .join('\n')
-            .match(/\/\* --- Report Preview Styles --- \*\/([\s\S]*?)\/\* --- End Report Preview Styles --- \*\//)?.[1] || ''
-        }
-    </style>
-</head>
-<body class="report-body">
-    ${previewContent.innerHTML}
-</body>
-</html>`;
+        /** Generates the full HTML content for the PREVIEW modal. */
+        function generatePreviewHTML() {
+            const formData = new FormData(reportForm);
+            const data = {};
+            // Get single values
+            ['reportLogoUrl', 'reportTitle', 'subtitle', 'introduction', 'sampleSize', 'ageGroup', 'toolsUsed', 'evaluationFramework'].forEach(key => {
+                data[key] = formData.get(key)?.trim() || '';
+            });
+            // Get array values - CRITICAL: Use getCompanyNames() for consistency
+            data.companies = getCompanyNames(); // Use the helper function
+            data.tasks = formData.getAll('tasks[]').map(t => t.trim()).filter(Boolean);
+            data.impactPoints = formData.getAll('impactPoints[]').map(p => p.trim()).filter(Boolean);
 
-            const blob = new Blob([reportFullHtml], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${(document.getElementById('reportTitle')?.value || 'report').replace(/[^a-z0-9]/gi, '_').toLowerCase()}.html`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            console.log("HTML download initiated.");
-        }
+            // Get Metrics
+            data.metrics = [];
+            const metricNameInputs = metricsList.querySelectorAll('input[name="metricNames[]"]');
+            metricNameInputs.forEach((nameInput) => {
+                 const row = nameInput.closest('.metric-row');
+                 const name = nameInput.value.trim();
+                 const values = [];
+                 for (let i = 0; i < data.companies.length; i++) {
+                    const valInput = row.querySelector(`input[name="metric${i+1}Values[]"]`);
+                    values.push(valInput ? valInput.value.trim() : '');
+                 }
+                 if (name || values.some(Boolean)) data.metrics.push({ name: name || 'Unnamed Metric', values: values });
+             });
 
-        // Download PDF using html2pdf.js
-        function downloadPDF() {
-            if (downloadPdfBtn.disabled || !window.html2pdf) {
-                console.error("PDF download button disabled or html2pdf library not loaded.");
-                return;
+
+            // Get Heuristics
+             data.heuristics = [];
+             const heuristicNameInputs = heuristicsList.querySelectorAll('input[name="heuristicNames[]"]');
+             heuristicNameInputs.forEach((nameInput) => {
+                  const row = nameInput.closest('.metric-row');
+                  const name = nameInput.value.trim();
+                  const values = [];
+                  for (let i = 0; i < data.companies.length; i++) {
+                     const valInput = row.querySelector(`input[name="heuristic${i+1}Values[]"]`);
+                     values.push(valInput ? valInput.value.trim() : '');
+                  }
+                  if (name || values.some(Boolean)) data.heuristics.push({ name: name || 'Unnamed Heuristic', values: values });
+              });
+
+
+            // Get Takeaways
+             data.takeaways = [];
+             const companyTakeawayNames = getCompanyNames(); // Use helper
+             const companyQuotes = formData.getAll('companyQuotes[]'); // Direct read is fine here
+             const takeawaySectionsElements = takeawaysSection.querySelectorAll('.takeaway-company-section');
+             takeawaySectionsElements.forEach((section, i) => {
+                 if (i >= companyTakeawayNames.length) return; // Skip if takeaway section exceeds company count
+
+                 const companyIdPrefix = `company${i + 1}`;
+                 // Read strengths/weaknesses directly from the current form state
+                 const strengths = Array.from(section.querySelectorAll(`input[name="${companyIdPrefix}Strengths[]"]`)).map(s => s.value.trim()).filter(Boolean);
+                 const weaknesses = Array.from(section.querySelectorAll(`input[name="${companyIdPrefix}Weaknesses[]"]`)).map(w => w.value.trim()).filter(Boolean);
+
+                 const name = companyTakeawayNames[i] || ''; // Name from the main list
+                 const quote = companyQuotes[i]?.trim() || '';
+
+                 if (name || strengths.length > 0 || weaknesses.length > 0 || quote) {
+                     data.takeaways.push({ name: name || `Company ${i+1}`, strengths, weaknesses, quote });
+                 }
+             });
+
+
+              // Get Image Comparisons
+              data.imageComparisons = [];
+              const imageComparisonSets = imageComparisonList.querySelectorAll('.image-comparison-set');
+              imageComparisonSets.forEach((set) => {
+                   const captionInput = set.querySelector('input[name="imageCaptions[]"]');
+                   const caption = captionInput ? captionInput.value.trim() : '';
+                   const urls = [];
+                    for (let i = 0; i < data.companies.length; i++) {
+                        const urlInput = set.querySelector(`input[name="imageComp${i+1}Urls[]"]`);
+                        urls.push(urlInput ? urlInput.value.trim() : '');
+                    }
+                   if (caption || urls.some(Boolean)) {
+                       data.imageComparisons.push({ caption: caption || 'Image Comparison', urls: urls });
+                   }
+               });
+
+            // --- Build HTML String for PREVIEW ---
+            // Uses richer CSS classes from the main <style> block
+            let html = '';
+            if (data.reportLogoUrl) {
+                // Added simple onerror placeholder directly
+                html += `<img src="${data.reportLogoUrl}" alt="Report Logo" class="report-logo" onerror="this.outerHTML='<p class=image-error-placeholder>Logo Load Failed</p>'">`;
+            }
+            html += `<h1>${data.reportTitle || 'Report'}</h1>`;
+            if (data.subtitle) html += `<p class="report-subtitle">${data.subtitle}</p>`;
+            if (data.introduction) html += `<h2>Introduction</h2><p>${data.introduction.replace(/\n/g, '<br>')}</p>`;
+            // Display companies from the consistent source
+            if (data.companies.length > 0) html += `<p><strong>Companies Compared:</strong> ${data.companies.join(', ')}</p>`;
+            html += `<h2>Methodology</h2><ul>`;
+            if (data.sampleSize) html += `<li><strong>Sample Size:</strong> ${data.sampleSize}</li>`;
+            if (data.ageGroup) html += `<li><strong>Age Group:</strong> ${data.ageGroup}</li>`;
+            if (data.toolsUsed) html += `<li><strong>Tools Used:</strong> ${data.toolsUsed}</li>`;
+            if (data.evaluationFramework) html += `<li><strong>Evaluation Framework:</strong> ${data.evaluationFramework}</li>`;
+            if (data.tasks.length > 0) html += `<li><strong>Test Tasks:</strong><ul>${data.tasks.map(t => `<li>${t}</li>`).join('')}</ul></li>`;
+            html += `</ul>`;
+
+            if (data.metrics.length > 0) {
+                html += `<h2>Quantitative Metrics</h2><table><thead><tr><th>Metric</th>`;
+                data.companies.forEach(name => html += `<th>${name}</th>`); // Use consistent company names
+                html += `</tr></thead><tbody>`;
+                data.metrics.forEach(metric => {
+                    html += `<tr><td>${metric.name}</td>`;
+                    // Ensure we only output columns for existing companies
+                    for(let i=0; i < data.companies.length; i++){
+                        html += `<td>${metric.values[i] || ''}</td>`;
+                    }
+                    html += `</tr>`;
+                });
+                html += `</tbody></table>`;
             }
 
-            // Select the element to print (the container with the page boundary)
-            const reportElement = previewContent.querySelector('.report-container');
-            if (!reportElement) {
-                console.error("Report content container not found for PDF generation.");
-                alert("Could not find report content to generate PDF. Please generate the preview first.");
-                return;
-            }
-
-            // Clone the element to avoid modifying the preview
-            const elementToPrint = reportElement.cloneNode(true);
-
-            // --- Options for html2pdf ---
-             const pdfOptions = {
-                 margin:       [0.5, 0.25, 0.5, 0.25], // Margins in inches [top, left, bottom, right] - Reduced side margins slightly
-                 filename:     `${(document.getElementById('reportTitle')?.value || 'report').replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`,
-                 image:        { type: 'jpeg', quality: 0.98 }, // Image settings
-                 html2canvas:  {
-                     scale: 2, // Higher scale for better resolution
-                     logging: false, // Disable extensive logging
-                     useCORS: true, // Enable CORS if using external images
-                     scrollX: 0, // Ensure capture starts at the top-left
-                     scrollY: -window.scrollY // Account for page scroll if any
-                 },
-                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }, // PDF settings
-                 pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // Page break handling
-             };
-
-            // Disable button and show loading indicator
-            downloadPdfBtn.disabled = true;
-            downloadHtmlBtn.disabled = true; // Also disable HTML download during PDF generation
-            pdfLoadingIndicator.style.display = 'block';
-            console.log("Starting PDF generation...");
-
-            // --- Generate PDF ---
-             html2pdf().from(elementToPrint).set(pdfOptions).save()
-                 .then(() => {
-                     console.log("PDF generated successfully.");
-                 })
-                 .catch(err => {
-                     console.error("Error generating PDF:", err);
-                     alert("An error occurred while generating the PDF. Please check the console for details.");
-                 })
-                 .finally(() => {
-                     // Re-enable buttons and hide loading indicator
-                     downloadPdfBtn.disabled = false;
-                     downloadHtmlBtn.disabled = false;
-                     pdfLoadingIndicator.style.display = 'none';
-                     console.log("PDF generation process finished.");
+            if (data.heuristics.length > 0) {
+                html += `<h2>Heuristic Breakdown</h2><table><thead><tr><th>Heuristic</th>`;
+                data.companies.forEach(name => html += `<th>${name}</th>`); // Use consistent company names
+                html += `</tr></thead><tbody>`;
+                 data.heuristics.forEach(heuristic => {
+                     html += `<tr><td>${heuristic.name}</td>`;
+                     // Ensure we only output columns for existing companies
+                     for(let i=0; i < data.companies.length; i++){
+                         html += `<td>${heuristic.values[i] || ''}</td>`;
+                     }
+                     html += `</tr>`;
                  });
+                html += `</tbody></table>`;
+            }
+
+             // Placeholder for the chart - Chart.js will target this ID
+             const chartData = getChartData(); // Check if data exists
+             if (chartData.labels.length > 0) {
+                 html += `<div class="chart-container"><h2>Quantitative Metrics Comparison</h2><canvas id="metricsChartPreview"></canvas></div>`;
+             } else {
+                  html += `<div class="chart-container"><h2>Quantitative Metrics Comparison</h2><p style='text-align: center; color: var(--medium-gray);'>No numerical data provided for charting.</p></div>`;
+             }
+
+
+             if (data.imageComparisons.length > 0) {
+                 html += `<h2 class="image-comparison-section">Image Comparison</h2>`;
+                 data.imageComparisons.forEach(set => {
+                     html += `<div class="image-comparison-item">`;
+                     if (set.caption) html += `<h3>${set.caption}</h3>`;
+                     html += `<div class="image-comparison-grid">`;
+                     // Iterate only over the number of companies we have
+                     for(let i=0; i < data.companies.length; i++){
+                         const url = set.urls[i];
+                         const companyName = data.companies[i];
+                         if (url) {
+                             // More robust onerror handler for preview
+                             // Escape single quotes in company name for the JS string
+                             const escapedCompanyName = companyName.replace(/'/g, "\\'");
+                             const onErrorScript = `this.onerror=null; this.outerHTML='<figure><div class="image-error-placeholder">Image failed to load<br>(${escapedCompanyName})</div><figcaption>${companyName}</figcaption></figure>';`;
+                             html += `<figure><img src="${url}" alt="${set.caption} - ${companyName}" onerror="${onErrorScript}"><figcaption>${companyName}</figcaption></figure>`;
+                         } else {
+                              // Optional: Add a placeholder if URL is missing but company exists
+                              // html += `<figure><div class="image-error-placeholder">No Image Provided<br>(${companyName})</div><figcaption>${companyName}</figcaption></figure>`;
+                         }
+                     }
+                     html += `</div></div>`;
+                 });
+             }
+
+
+            if (data.takeaways.length > 0) {
+                html += `<h2>UX Takeaways</h2>`;
+                data.takeaways.forEach(takeaway => {
+                    html += `<h3>${takeaway.name}</h3>`; // Name from the main list
+                    if (takeaway.strengths.length > 0) html += `<p><strong>Strengths:</strong><ul>${takeaway.strengths.map(s => `<li>${s}</li>`).join('')}</ul></p>`;
+                    if (takeaway.weaknesses.length > 0) html += `<p><strong>Weaknesses:</strong><ul>${takeaway.weaknesses.map(w => `<li>${w}</li>`).join('')}</ul></p>`;
+                    if (takeaway.quote) html += `<div class="quote">${takeaway.quote}</div>`;
+                });
+            }
+            if (data.impactPoints.length > 0) html += `<h2>Industry Impact</h2><ul>${data.impactPoints.map(p => `<li>${p}</li>`).join('')}</ul>`;
+            return html;
         }
 
-        // --- Utility Functions ---
-        function escapeHtml(unsafe) {
-            if (typeof unsafe !== 'string') return unsafe;
-            return unsafe
-                 .replace(/&/g, "&amp;")
-                 .replace(/</g, "&lt;")
-                 .replace(/>/g, "&gt;")
-                 .replace(/"/g, "&quot;")
-                 .replace(/'/g, "&#039;");
+        /** Generates the report preview, including the chart. */
+        function generatePreview() {
+             const reportHTML = generatePreviewHTML(); // Generate the HTML structure first
+             previewContentArea.innerHTML = reportHTML; // Set the HTML
+
+             // Now find the canvas *after* it's added to the DOM
+             const previewChartCanvas = document.getElementById('metricsChartPreview');
+             const chartData = getChartData(); // Get potentially updated data
+
+             // Destroy previous chart instance if it exists
+             if (chartInstance) {
+                 chartInstance.destroy();
+                 chartInstance = null;
+             }
+
+             // Create new chart if canvas exists and there's data
+             if (previewChartCanvas && chartData.labels.length > 0) {
+                 const ctxPreview = previewChartCanvas.getContext('2d');
+                 try {
+                     chartInstance = new Chart(ctxPreview, {
+                         type: 'bar',
+                         data: chartData,
+                         options: getChartOptions() // Use the shared options
+                     });
+                 } catch (error) {
+                     console.error("Error creating preview chart:", error);
+                     const chartContainer = previewChartCanvas.closest('.chart-container');
+                      if(chartContainer) { // Add error message inside container
+                          const errorP = document.createElement('p');
+                          errorP.style.color = 'red';
+                          errorP.style.textAlign = 'center';
+                          errorP.textContent = 'Error rendering chart.';
+                          previewChartCanvas.replaceWith(errorP); // Replace canvas with error
+                      }
+                 }
+             } else if (previewChartCanvas) {
+                 // Handle case where canvas exists but no data (message already added in generatePreviewHTML)
+                 console.log("No chart data to render in preview.");
+             }
+
+             // Display the preview modal
+             previewContainer.style.display = 'flex';
+         }
+
+
+        // --- Initialization ---
+        function initializeForm() {
+            // Add initial companies to the primary list
+            initialCompanies.forEach((name, index) => {
+                createItemRow(companiesList, 'companies[]', 'Company Name...', name, true, 'Company', 'text');
+            });
+            companyCount = initialCompanies.length; // Set initial count
+
+            // Create corresponding takeaway sections (using data from initialTakeaways)
+            initialTakeaways.forEach((takeawayData, index) => {
+                 if (index < initialCompanies.length) { // Ensure we don't create more takeaways than companies
+                     createTakeawaySection(
+                         index,
+                         initialCompanies[index], // Use name from company list
+                         takeawayData.strengths || [],
+                         takeawayData.weaknesses || [],
+                         takeawayData.quote || ''
+                     );
+                 }
+             });
+
+
+             initialMetrics.forEach(metric => createMultiCompanyRow(metricsList, 'Metric Name', 'Value', metric.name, [metric.v1, metric.v2, metric.v3], 'metricNames[]', ['metric1Values[]', 'metric2Values[]', 'metric3Values[]'], 'Metric Row'));
+             initialHeuristics.forEach(heuristic => createMultiCompanyRow(heuristicsList, 'Heuristic Name', 'Evaluation', heuristic.name, [heuristic.v1, heuristic.v2, heuristic.v3], 'heuristicNames[]', ['heuristic1Values[]', 'heuristic2Values[]', 'heuristic3Values[]'], 'Heuristic Row'));
+
+            updateCompanyHeaders(); // Ensure headers and inputs match initial state
         }
 
-    </script>
+        initializeForm(); // Populate the form on load
+
+    }); // End DOMContentLoaded
+</script>
 
 </body>
 </html>
